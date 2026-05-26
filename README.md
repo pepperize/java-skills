@@ -9,7 +9,9 @@ Reusable Java agent skills for applying company engineering standards across Jav
 - `java-logging-exceptions`: logging and exception placement guidance for domain-relevant failures and technical boundaries.
 - `java-domain-clarification`: clarification workflow before domain-sensitive implementation changes.
 - `java-clean-architecture`: Clean Architecture guidance for Java projects. This skill is guarded and should only be used when the project's main instruction file explicitly states Clean Architecture.
-- `java-ddd-architecture`: DDD guidance for Java projects. This skill is guarded and should only be used when the project's main instruction file explicitly states DDD or Domain-Driven Design.
+- `java-ddd-architecture`: DDD guidance for Java projects, including Spring configuration placement and Spring web boundary naming. This skill is guarded and should only be used when the project's main instruction file explicitly states DDD or Domain-Driven Design.
+- `java-spring-security`: Spring Security authorization conventions for controller boundaries, capabilities, roles, and object-scoped permissions.
+- `java-flyway-migrations`: Flyway migration creation and timestamp-based version naming conventions.
 
 ## Architecture Skill Activation
 

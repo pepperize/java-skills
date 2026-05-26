@@ -1,4 +1,4 @@
-                                                                                                                                                                                                                          ---
+---
 name: java-testing-style
 description: Applies company Java testing conventions and verification heuristics. Use when adding or changing Java tests, fixing failing tests, doing TDD, choosing unit versus integration coverage, or selecting Maven/Gradle verification scope.
 ---
@@ -19,11 +19,19 @@ Name unit test methods with:
 
 Prefer naming the observed value `actual`.
 
+Prefer JUnit Jupiter assertions over AssertJ.
+
+Use `org.junit.jupiter.api.Assertions` for assertions in tests. Do not introduce AssertJ unless the project already requires it or the user explicitly asks for it.
+
 ## Unit Tests
 
 Default to London-style unit tests for application services, use cases, orchestration classes, and collaborators with ports or clients.
 
 Prefer mocking collaborators when that keeps the SUT declarative with `@InjectMocks`.
+
+In London-style unit tests, prefer mocking all collaborators, including simple configuration holders, when that keeps the SUT declarative with `@InjectMocks`.
+
+Avoid `@BeforeEach` setup methods that only exist to wire dependencies into the SUT.
 
 Use real collaborators in a unit test only when that collaborator is part of the behavior intentionally under test and does not turn the test into a boundary integration test.
 
@@ -52,6 +60,16 @@ Good candidates include Spring controllers for routing, authentication, authoriz
 Repositories and external boundaries should use realistic stable infrastructure when available, such as Testcontainers or Localstack.
 
 Do not force integration tests for external systems that cannot be exercised in a stable, realistic way. Use unit tests there instead.
+
+Keep lightweight unit tests in `src/test/java`.
+
+Place integration tests in `src/test-integration/java`.
+
+Name integration test classes with an `IT` suffix so Failsafe-style builds can select them consistently.
+
+Avoid `MvcTest` or `IntegrationTest` suffixes for integration test classes unless the project already uses that convention.
+
+Tests using `@SpringBootTest`, `@DataJpaTest`, `MockMvc`, Testcontainers, real repositories, or other framework and infrastructure boundaries belong in `src/test-integration/java`.
 
 ## Verification
 

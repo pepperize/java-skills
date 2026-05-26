@@ -19,6 +19,16 @@ Avoid passing non-trivial method calls directly as arguments to other method cal
 
 Prefer simple, common words that non-native speakers can read without looking them up.
 
+## Guard Clauses
+
+Do not use `org.springframework.util.Assert` in application, domain, or service code.
+
+Prefer explicit guard clauses with normal `if` statements and meaningful exceptions.
+
+At API boundaries, prefer Bean Validation annotations where appropriate.
+
+Inside business logic, prefer explicit checks over assertion utilities.
+
 ## Factories
 
 When a class mainly creates a returned object, prefer the Factory pattern.
