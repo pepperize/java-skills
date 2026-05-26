@@ -20,3 +20,13 @@ Architecture skills are intentionally conditional. They should not be activated 
 Use `java-clean-architecture` only when `AGENTS.md`, `CLAUDE.md`, or the project's equivalent main instruction file explicitly states that the project uses Clean Architecture.
 
 Use `java-ddd-architecture` only when the main instruction file explicitly states that the project uses DDD or Domain-Driven Design.
+
+## Local Installation
+
+Install or refresh symlinks into the local agent skills directory:
+
+```bash
+./scripts/install-local-skills.sh
+```
+
+Set `AGENTS_SKILLS_DIR` to install somewhere other than `$HOME/.agents/skills`.
