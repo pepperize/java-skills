@@ -23,10 +23,24 @@ Use `java-ddd-architecture` only when the main instruction file explicitly state
 
 ## Local Installation
 
-Install or refresh symlinks into the local agent skills directory:
+Install or refresh links into the local agent skills directory.
+
+Linux:
 
 ```bash
 ./scripts/install-local-skills.sh
+```
+
+macOS:
+
+```bash
+./scripts/install-local-skills-macos.sh
+```
+
+Windows PowerShell:
+
+```powershell
+.\scripts\install-local-skills-windows.ps1
 ```
 
 Set `AGENTS_SKILLS_DIR` to install somewhere other than `$HOME/.agents/skills`.
