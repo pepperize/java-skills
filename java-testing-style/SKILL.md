@@ -12,6 +12,7 @@ description: Use when adding or changing Java tests, fixing failing tests, doing
 - Name unit tests `given{SomeCondition}_should{ExpectedResult}`.
 - Name the observed value `actual`.
 - Use JUnit Jupiter assertions from `org.junit.jupiter.api.Assertions`; do not introduce AssertJ unless the project requires it or the user asks for it.
+- Keep assertions simple and readable.
 
 ## Unit Tests
 

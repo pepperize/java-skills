@@ -15,7 +15,7 @@ Follow the DDD rules in the project's own instruction files and domain docs.
 
 - Preserve clear boundaries and responsibilities between domain concepts, application services, and infrastructure concerns.
 - Ask for clarification before changing aggregates, entities, value objects, repositories, domain services, bounded-context language, or domain invariants when rules are missing or unclear.
-- If the project explicitly prefers anemic domain models, keep behavior primarily in services unless there is a strong reason to keep logic on the entity itself.
+- Prefer anemic domain models with behavior primarily in services unless there is a strong reason to keep logic on the entity itself.
 
 ## Spring Configuration
 
@@ -29,7 +29,7 @@ In DDD projects, treat Spring configuration as infrastructure, not application o
 
 ## Spring Web Boundaries
 
-- Package names should expose the architectural side when known: guest-facing code under frontend packages, backend/admin code under backend packages.
+- Package names should expose the architectural side when known: end-user-facing code under frontend packages, backend/admin code under backend packages.
 - Do not put side-specific controllers or services in a neutral application namespace when the side is known.
 - Keep application-layer names aligned with existing route and UI vocabulary instead of inventing synonyms.
 - Avoid ambiguous `Public...` and `Admin...` class prefixes when package boundaries or route vocabulary name the concept more clearly.
