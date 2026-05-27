@@ -27,6 +27,7 @@ When a class mainly creates a returned object, prefer the Factory pattern: name 
 ## Method Names
 
 - Methods should read as actions. Prefer verb phrases such as `createMissingTranslationSkip`, `collectRoutes`, `resolveCountryCode`, or `publishSeoData`.
+- Do not repeat information already carried by the class name, receiver, or return type unless it distinguishes variants or avoids ambiguity at call sites. Prefer `DataFactory.create()` over `DataFactory.createData()`.
 - Avoid noun/adjective-only method names like `missingTranslation(...)` unless the method is a JavaBean getter, record accessor, enum/value property, or boolean predicate.
 - Boolean predicates should still read clearly as questions or states, using `is`, `has`, `can`, `should`, or similar.
 - Static factory methods should also use an action-oriented name unless they are established Java conventions such as `of(...)`, `from(...)`, or `valueOf(...)`.
