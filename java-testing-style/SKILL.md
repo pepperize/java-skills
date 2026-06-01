@@ -47,3 +47,11 @@ Run the narrowest command that credibly verifies the change before broadening.
 - Use case and adapter orchestration changes: affected unit test classes.
 - Controller, security, and event-listener changes: relevant integration tests.
 - Persistence, object storage, file parsing, and infrastructure boundaries: boundary integration tests plus focused unit tests around helper collaborators when present.
+
+## Verification Scope Review
+
+Before broadening test scope:
+
+- Run the narrowest affected test classes first.
+- Do not run broad suites when known environment-dependent tests are unrelated to the change.
+- If a focused test failure exposes a wrong assumption, fix the production assumption first instead of adding test-only branches.
