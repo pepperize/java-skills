@@ -6,6 +6,7 @@ Reusable Java agent skills for applying company engineering standards across Jav
 
 - `java-readable-code`: readable Java code, focused responsibilities, factory naming, `Optional` usage, and avoiding hard-to-read nested method calls.
 - `java-testing-style`: unit and integration testing conventions, London-style defaults, test layout, naming, and verification scope.
+- `java-solid-review`: SOLID, responsibility-boundary, code-smell, and pragmatic OO design review for Java production code. Testing guidance stays delegated to `java-testing-style`.
 - `java-logging-exceptions`: logging and exception placement guidance for domain-relevant failures and technical boundaries.
 - `java-domain-clarification`: clarification workflow before domain-sensitive implementation changes.
 - `java-clean-architecture`: Clean Architecture guidance for Java projects. This skill is guarded and should only be used when the project's main instruction file explicitly states Clean Architecture.
