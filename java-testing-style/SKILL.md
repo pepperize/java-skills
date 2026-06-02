@@ -36,8 +36,8 @@ description: Use when adding or changing Java tests, fixing failing tests, doing
 - Place integration tests at technical boundaries where framework or infrastructure behavior is the risk: Spring controllers, authentication, authorization, binding, serialization, repositories, and external clients with stable realistic infrastructure such as Testcontainers or Localstack.
 - Use unit tests instead for external systems that cannot be exercised stably and realistically.
 - Keep lightweight unit tests in `src/test/java`.
-- Put integration tests in `src/test-integration/java`, name classes with an `IT` suffix, and avoid `MvcTest` or `IntegrationTest` suffixes unless the project already uses them.
-- Tests using `@SpringBootTest`, `@DataJpaTest`, `MockMvc`, Testcontainers, real repositories, or other framework/infrastructure boundaries belong in `src/test-integration/java`.
+- Put integration tests in `src/test-integration/java` or `src/test-it/java`, name classes with an `IT` suffix, and avoid `MvcTest` or `IntegrationTest` suffixes.
+- Tests using `@SpringBootTest`, `@DataJpaTest`, `MockMvc`, Testcontainers, real repositories, or other framework/infrastructure boundaries belong in `src/test-integration/java` or `src/test-it/java`.
 
 ## Verification
 
