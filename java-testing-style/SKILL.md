@@ -39,6 +39,16 @@ description: Use when adding or changing Java tests, fixing failing tests, doing
 - Put integration tests in `src/test-integration/java`, name classes with an `IT` suffix, and avoid `MvcTest` or `IntegrationTest` suffixes unless the project already uses them.
 - Tests using `@SpringBootTest`, `@DataJpaTest`, `MockMvc`, Testcontainers, real repositories, or other framework/infrastructure boundaries belong in `src/test-integration/java`.
 
+## Persistent Test Data
+
+- Arrange persistent state through the narrowest existing API that owns the responsibility for that state.
+- Prefer existing services or use cases when setup must satisfy business rules, side effects, or cross-aggregate invariants.
+- Prefer repositories when the test only needs already-valid persisted entities and repository behavior is not the subject under test.
+- Use test data builders, fixture factories, or project-local test helpers for object construction; keep persistence, business behavior, and object construction in separate helpers.
+- Do not embed SQL statements in Java test code, including `JdbcTemplate` calls, native queries, multiline SQL strings, or `@Sql(statements = ...)`.
+- When SQL is genuinely necessary for database-boundary setup, put it in dedicated `.sql` files under test resources and reference those files, for example with `@Sql(scripts = ...)`.
+- Keep schema changes in migrations, not Java tests or inline test setup.
+
 ## Verification
 
 Run the narrowest command that credibly verifies the change before broadening.
