@@ -12,6 +12,8 @@ $skills = @(
     "java-ddd-architecture",
     "java-readable-code",
     "java-testing-style",
+    "java-solid-review",
+    "java-agent-instructions",
     "java-logging-exceptions",
     "java-domain-clarification",
     "java-spring-security",

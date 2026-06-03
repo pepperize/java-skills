@@ -31,6 +31,7 @@ When a class mainly creates a returned object, prefer the Factory pattern: name 
 - Avoid noun/adjective-only method names like `missingTranslation(...)` unless the method is a JavaBean getter, record accessor, enum/value property, or boolean predicate.
 - Boolean predicates should still read clearly as questions or states, using `is`, `has`, `can`, `should`, or similar.
 - Static factory methods should also use an action-oriented name unless they are established Java conventions such as `of(...)`, `from(...)`, or `valueOf(...)`.
+- Before accepting new or renamed methods, classify each one as an accessor/property, boolean predicate, action/operation, or factory/construction helper. Accessors and record components should use noun or state names such as `status()`, `totalCount()`, `successCount()`, or `failureCount()`. Boolean predicates should read as predicates, such as `isSuccess()` or `hasFailures()`. Action, operation, and factory helper methods must use verb phrases. Avoid past-tense or adjective helper names such as `succeeded(...)`, `failed(...)`, `missingTranslation(...)`, or `partialSuccess(...)` when the method creates, transforms, or returns a result; prefer names such as `createSuccessResult(...)`, `createFailureResult(...)`, `resolveStatus()`, or `collectFailures(...)`.
 
 ## Static Helpers
 
@@ -51,6 +52,24 @@ When a class mainly creates a returned object, prefer the Factory pattern: name 
 - Prefer `Optional` as a return type at absence-producing boundaries.
 - Avoid `Optional` as a method parameter. Resolve absence at the caller or boundary and pass a concrete domain object, explicit overload, or purpose-named value instead.
 
+## Collections And Optional
+
+- Do not return `Optional<List<T>>`, `Optional<Set<T>>`, or `Optional<Map<K, V>>` when an empty collection fully represents "nothing found".
+- Collection-returning methods should return an empty collection for "no items".
+- Use `Optional<Collection>` only when absence of the collection itself has a real, named meaning that is different from an empty collection.
+- Do not use `Optional.empty()` to smuggle failure through collection-producing code. If failure is real and expected, model it explicitly; if it is unexpected, let the exception point to the real defect.
+
 ## Tests And Production Code
 
 Do not add production code only to make tests easier. Avoid test-only constructors, fallbacks, flags, or branches; tests should construct collaborators explicitly or use proper mocking and injection.
+
+## Required Pre-Final Self-Review
+
+Before finalizing Java code changes:
+
+- Review every newly added or renamed method.
+- Classify each as accessor/property, boolean predicate, action/operation, or factory/construction helper.
+- Accessors may use noun names. Predicates should use `is`, `has`, `can`, `should`, or similar.
+- Action, operation, formatting, mapping, and helper methods must use verb phrases.
+- Remove helper methods that only hide one obvious call unless they enforce a real invariant or improve a repeated concept.
+- Check any new defensive branch against known domain/API assumptions. If the user or project states the value cannot occur, do not add handling for it without asking.
