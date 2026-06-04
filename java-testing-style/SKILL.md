@@ -61,6 +61,8 @@ description: Use when adding or changing Java tests, fixing failing tests, doing
 
 Run the narrowest command that credibly verifies the change before broadening.
 
+For database, configuration, migration, dependency, template, or resource changes that can affect application boot, include project-documented startup verification in the final verification scope, not just unit tests.
+
 - Mapper, factory, and small service changes: focused unit tests first.
 - Use case and adapter orchestration changes: affected unit test classes.
 - Controller, security, and event-listener changes: relevant integration tests.
