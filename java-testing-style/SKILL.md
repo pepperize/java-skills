@@ -31,6 +31,14 @@ description: Use when adding or changing Java tests, fixing failing tests, doing
 - Use empty lines only between major blocks such as Arrange/Act/Assert or Given/When/Then.
 - For repeated interactions such as loop iterations, order setup in the same sequence as the code under test.
 
+## Parameterized Tests
+
+- Prefer a parameterized test when multiple tests exercise the same behavior, vary only input data, and assert the same outcome or violation path.
+- For Bean Validation tests, group invalid values for the same property into one parameterized test, such as `givenInvalidRegionCode_shouldFailValidation`.
+- Use the simplest source that expresses the cases: `@NullSource`, `@EmptySource`, `@ValueSource`, or `@CsvSource` before `@MethodSource`.
+- Do not fold cases into a parameterized test when setup becomes less readable, such as null map values requiring mutable map construction.
+- Name the test after the shared behavior, not every individual case.
+
 ## Integration Tests
 
 - Place integration tests at technical boundaries where framework or infrastructure behavior is the risk: Spring controllers, authentication, authorization, binding, serialization, repositories, and external clients with stable realistic infrastructure such as Testcontainers or Localstack.
@@ -52,6 +60,8 @@ description: Use when adding or changing Java tests, fixing failing tests, doing
 ## Verification
 
 Run the narrowest command that credibly verifies the change before broadening.
+
+For database, configuration, migration, dependency, template, or resource changes that can affect application boot, include project-documented startup verification in the final verification scope, not just unit tests.
 
 - Mapper, factory, and small service changes: focused unit tests first.
 - Use case and adapter orchestration changes: affected unit test classes.
