@@ -46,3 +46,11 @@ Windows PowerShell:
 ```
 
 Set `AGENTS_SKILLS_DIR` to install somewhere other than `$HOME/.agents/skills`.
+
+## License
+
+This project is licensed under the Apache License 2.0. You may use, copy, modify, distribute, and adapt this skill collection, including for commercial purposes, subject to the terms of the license.
+
+Attribution is appreciated via a link back to the original repository: https://github.com/pepperize/java-skills.
+
+The skill collection is provided "as is", without warranties or conditions of any kind. As summarized from the Apache License 2.0 disclaimer and limitation of liability, except where required by applicable law or agreed in writing, Pepperize UG is not responsible for harm, damages, or losses arising from use of the skill collection.
