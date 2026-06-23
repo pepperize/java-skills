@@ -27,6 +27,8 @@ Throw exceptions where the problem originates.
 
 Avoid helper or factory methods that throw internally when the caller is the place that understands the failed invariant or boundary condition.
 
+Do not add application exceptions only to translate malformed HTTP requests into HTTP responses. Throw or map API-boundary client errors in the controller or API adapter.
+
 ## Exception Boundaries
 
 - Do not catch broad `RuntimeException` in orchestration code just to log and convert it into an empty `Optional`, empty collection, or generic failure result.

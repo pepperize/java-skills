@@ -25,6 +25,12 @@ Prefer dependency direction toward the domain or application core. Outer adapter
 
 Use cases should orchestrate business flow and delegate technical concerns to ports or cohesive collaborators.
 
+Use cases should receive already-shaped application input. Keep transport and request-shape validation at the controller or API adapter boundary, such as missing query parameters, mutually required query parameters, path/query/body syntax, Bean Validation constraints, endpoint-specific unsupported enum values, and mapping those failures to HTTP status codes.
+
+Avoid nullable parameter combinations inside a use case to choose between request modes. Prefer separate use-case methods, a purpose-named command object, or a small controller/API adapter decision.
+
+Keep domain and application invariants in the application layer when they are independent of HTTP transport and must hold for every caller.
+
 Avoid letting use cases accumulate unrelated creation, conversion, logging, key formatting, or client-specific responsibilities.
 
 When orchestration becomes hard to read, extract cohesive factories, selectors, policies, or publishers with narrow names.

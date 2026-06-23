@@ -35,3 +35,15 @@ In DDD projects, treat Spring configuration as infrastructure, not application o
 - Avoid ambiguous `Public...` and `Admin...` class prefixes when package boundaries or route vocabulary name the concept more clearly.
 - Controller method names should mechanically mirror the HTTP route: HTTP verb prefix plus resource noun and optional route action.
 - Keep domain verbs in services or use cases rather than controller method names.
+
+## API Boundary Validation
+
+Treat HTTP request shape as a web adapter concern, not a domain concern.
+
+Validate transport-level input at the controller or API boundary: required query/path/body parameters, mutually required parameters, syntax, Bean Validation constraints, endpoint-specific unsupported enum values, and HTTP status mapping.
+
+Translate web DTOs, query parameters, and OpenAPI-generated models into application commands or purpose-named method calls before invoking application services. Do not pass nullable parameter combinations into application services to represent different HTTP request modes.
+
+Only promote validation into the domain or application layer when it expresses a domain invariant in the bounded context's language and must hold for every caller, not just for one HTTP endpoint.
+
+Do not create domain concepts or domain exceptions for malformed HTTP requests unless the same rule is genuinely part of the ubiquitous language.
