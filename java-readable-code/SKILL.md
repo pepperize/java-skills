@@ -47,6 +47,39 @@ When a class mainly creates a returned object, prefer the Factory pattern: name 
 - Avoid paired public methods for the same operation, such as `create(...)` and `createWith...(...)`, unless both are required by production or an external contract.
 - If compatibility is intentionally kept, identify the production or external caller that still needs it.
 
+## Numeric Types And Counts
+
+Prefer the type that matches the semantic model across the call chain, not the narrowest type used by the first caller.
+
+For counts, totals, and accumulated result metrics:
+
+- Prefer `long` when values come from APIs that naturally return `long`, such as `Stream.count()`.
+- Prefer widening the small model consistently over adding local narrowing conversions like `Math.toIntExact(...)`.
+- Do not keep `int` only because current inputs come from `List.size()`; `int` values widen to `long` cleanly at call sites.
+- If a count is aggregated, merged, reported, or stored in an exception/result object, choose one count type across the related model.
+
+For local variables initialized from a simple, obvious source such as `List.size()`, prefer `var` when
+the value is only passed to a wider count API and does not participate in accumulation, merging,
+overflow-sensitive arithmetic, or persistence/DTO shape. Do not spell `long` solely to widen a
+`List.size()` result at the local declaration if that creates reader surprise; let Java widen at the
+call boundary.
+
+```java
+var count = seoDataList.size();
+return resultFactory.createSuccess(count);
+
+var failureCount = 0L;
+failureCount += batch.stream().filter(...).count();
+```
+
+Keep `int` only when there is a concrete constraint:
+
+- Java collection indexing or array indexing.
+- An external API, DTO, database schema, or OpenAPI contract requires `int`.
+- The value is explicitly bounded by a domain invariant that should be represented as `int`.
+
+When changing a count type, update the cohesive model together instead of moving conversions downstream.
+
 ## Optional
 
 - Prefer `Optional` as a return type at absence-producing boundaries.
