@@ -1,0 +1,45 @@
+- description: java-testing-style:bean-validation-parameterized
+  prompts:
+    - apply-skill
+  vars:
+    skill: file://../java-testing-style/SKILL.md
+    task: |
+      Write a focused JUnit Jupiter test for Bean Validation on CreateMarketRequest.regionCode.
+      Invalid region codes are null, empty, "XX", and "INVALID".
+      Use a parameterized test when suitable and keep setup local to the test.
+    project_instructions: |
+      The project uses JUnit Jupiter and jakarta.validation.Validator.
+      No project requirement exists for AssertJ.
+    code: |
+      import jakarta.validation.constraints.NotBlank;
+      import jakarta.validation.constraints.Pattern;
+
+      record CreateMarketRequest(
+          @NotBlank
+          @Pattern(regexp = "[A-Z]{2}")
+          String regionCode
+      ) {
+      }
+  assert:
+    - type: contains
+      value: '@ParameterizedTest'
+    - type: regex
+      value: '@(NullSource|NullAndEmptySource)\b'
+    - type: regex
+      value: '@(EmptySource|NullAndEmptySource)\b'
+    - type: contains
+      value: '@ValueSource'
+    - type: contains
+      value: givenInvalidRegionCode_shouldFailValidation
+    - type: regex
+      value: '\bactual\s*='
+    - type: regex
+      value: '(Assertions\.)?assert(False|True|Equals|Throws)\s*\('
+    - type: not-regex
+      value: '(^|\n)\s*@BeforeEach\b'
+    - type: not-regex
+      value: 'assertThat\s*\(|org\.assertj'
+  metadata:
+    id: java-testing-style:bean-validation-parameterized
+    skill: java-testing-style
+    kind: apply

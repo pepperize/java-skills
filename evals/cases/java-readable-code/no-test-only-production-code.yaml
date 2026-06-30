@@ -1,0 +1,39 @@
+- description: java-readable-code:no-test-only-production-code
+  prompts:
+    - review-code
+  vars:
+    skill: file://../java-readable-code/SKILL.md
+    code: |
+      class InvoicePublisher {
+          private final EmailGateway emailGateway;
+          private boolean skipEmailDelivery;
+
+          InvoicePublisher(EmailGateway emailGateway) {
+              this.emailGateway = emailGateway;
+          }
+
+          public void enableTestMode() {
+              this.skipEmailDelivery = true;
+          }
+
+          void publish(Invoice invoice) {
+              if (skipEmailDelivery) {
+                  return;
+              }
+
+              emailGateway.send(invoice);
+          }
+      }
+  assert:
+    - type: regex
+      value: '[Tt]est-only|only\s+for\s+tests|[Tt]est mode'
+    - type: regex
+      value: '[Pp]roduction\s+(api|method|code|surface|behavior)'
+    - type: regex
+      value: '[Tt]est setup|construct collaborators|[Mm]ock|package-private|injection|fake|stub'
+    - type: llm-rubric
+      value: 'Pass only if the review flags the public production test hook, explains that production API should not exist only for tests, and proposes improving test setup or using an appropriate narrow seam instead of adding public test-only API.'
+  metadata:
+    id: java-readable-code:no-test-only-production-code
+    skill: java-readable-code
+    kind: review

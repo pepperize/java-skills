@@ -1,0 +1,38 @@
+- description: java-domain-clarification:ambiguous-domain-scope
+  prompts:
+    - apply-skill
+  vars:
+    skill: file://../java-domain-clarification/SKILL.md
+    task: |
+      Implement product visibility filtering. When customerGroupId and salesChannel are present,
+      only return products visible for that customer group. tenantId is already present on the request.
+      Make the service change now.
+    code: |
+      record ProductSearchRequest(
+          String tenantId,
+          String customerGroupId,
+          String salesChannel
+      ) {
+      }
+
+      class ProductSearchService {
+
+          List<Product> search(ProductSearchRequest request) {
+              return productRepository.findByTenantId(request.tenantId());
+          }
+      }
+  assert:
+    - type: icontains
+      value: tenant
+    - type: regex
+      value: '[Cc]ustomer ?[Gg]roup'
+    - type: regex
+      value: '[Ss]ales ?[Cc]hannel'
+    - type: regex
+      value: '\?'
+    - type: llm-rubric
+      value: 'Pass only if the answer asks concrete clarification questions before coding, specifically probes tenant/customer group/sales channel scoping semantics, and does not implement speculative business logic.'
+  metadata:
+    id: java-domain-clarification:ambiguous-domain-scope
+    skill: java-domain-clarification
+    kind: apply

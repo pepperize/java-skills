@@ -1,0 +1,24 @@
+description: Practical evals for Java agent skills using OpenAI API billing
+
+env:
+  EVAL_PROVIDER: "{{ env.PROMPTFOO_EVAL_PROVIDER | default('openai:chat:gpt-5.5', true) }}"
+  GRADER_PROVIDER: "{{ env.PROMPTFOO_GRADER_PROVIDER | default(env.PROMPTFOO_EVAL_PROVIDER | default('openai:chat:gpt-5.5', true), true) }}"
+
+prompts:
+  - id: file://prompts/apply-skill.md
+    label: apply-skill
+  - id: file://prompts/review-code.md
+    label: review-code
+
+providers:
+  - id: "{{ env.EVAL_PROVIDER }}"
+    config:
+      max_completion_tokens: 1800
+      seed: 1
+
+defaultTest:
+  options:
+    provider: "{{ env.GRADER_PROVIDER }}"
+
+tests:
+  - file://cases/**/*.yaml

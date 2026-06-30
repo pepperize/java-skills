@@ -1,0 +1,45 @@
+- description: java-spring-security:controller-preauthorize-authority
+  prompts:
+    - apply-skill
+  vars:
+    skill: file://../java-spring-security/SKILL.md
+    task: |
+      Review and correct the authorization placement. This admin endpoint should require
+      INSTALLATION_CONTENT_PAGE_MANAGE.
+    code: |
+      import org.springframework.security.access.prepost.PreAuthorize;
+      import org.springframework.stereotype.Service;
+      import org.springframework.web.bind.annotation.PostMapping;
+      import org.springframework.web.bind.annotation.RestController;
+
+      @RestController
+      class ContentPageController {
+          private final ContentPageService service;
+
+          @PostMapping("/admin/content-pages")
+          ContentPage create(CreateContentPageRequest request) {
+              return service.create(request);
+          }
+      }
+
+      @Service
+      class ContentPageService {
+
+          @PreAuthorize("hasRole('ADMIN')")
+          ContentPage create(CreateContentPageRequest request) {
+              return contentPageRepository.save(ContentPage.from(request));
+          }
+      }
+  assert:
+    - type: contains
+      value: '@PreAuthorize'
+    - type: contains
+      value: "hasAuthority('INSTALLATION_CONTENT_PAGE_MANAGE')"
+    - type: not-regex
+      value: '(^|\n)\s*@PreAuthorize\("has(Any)?Role'
+    - type: llm-rubric
+      value: 'Pass only if authorization is moved or placed at the controller/API boundary, uses a direct capability authority with hasAuthority, avoids hasRole/hasAnyRole, and does not duplicate the same authorization in the service layer unless it identifies a separate security boundary.'
+  metadata:
+    id: java-spring-security:controller-preauthorize-authority
+    skill: java-spring-security
+    kind: apply
