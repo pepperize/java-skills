@@ -1,0 +1,32 @@
+- description: java-testing-style:test-naming-and-actual-variable
+  prompts:
+    - review-code
+  vars:
+    skill: file://../java-testing-style/SKILL.md
+    code: |
+      import org.junit.jupiter.api.Test;
+
+      import static org.junit.jupiter.api.Assertions.assertFalse;
+
+      class CreateMarketRequestTest {
+
+          @Test
+          void testValidation() {
+              var result = validator.validate(new CreateMarketRequest("XX"));
+
+              assertFalse(result.isEmpty());
+          }
+      }
+  assert:
+    - type: icontains
+      value: testValidation
+    - type: regex
+      value: 'given[A-Za-z0-9_]*_should[A-Za-z0-9_]*'
+    - type: icontains
+      value: actual
+    - type: llm-rubric
+      value: 'Pass only if the review flags vague test naming, recommends given{Condition}_should{ExpectedResult}, and says the observed result should be named actual.'
+  metadata:
+    id: java-testing-style:test-naming-and-actual-variable
+    skill: java-testing-style
+    kind: review

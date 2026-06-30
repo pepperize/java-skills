@@ -1,0 +1,31 @@
+- description: java-clean-architecture:activation-guard-negative
+  prompts:
+    - apply-skill
+  vars:
+    skill: file://../java-clean-architecture/SKILL.md
+    project_instructions: |
+      This project uses Spring Boot MVC with controllers, services, and repositories.
+      The main project instructions do not mention Clean Architecture, hexagonal architecture, or ports and adapters.
+    task: |
+      Refactor OrderService by introducing CreateOrderUseCase, OrderPort, and OrderAdapter.
+      Apply the architecture skill if it is active for this project.
+    code: |
+      class OrderService {
+
+          Order create(CreateOrderRequest request) {
+              return orderRepository.save(Order.from(request));
+          }
+      }
+  assert:
+    - type: regex
+      value: '[Nn]ot activated|[Nn]ot active|[Ii]nactive|[Dd]o not apply|[Mm]ust not apply|[Ss]hould not apply|[Dd]o not use|[Aa]ctivation guard'
+    - type: icontains
+      value: Clean Architecture
+    - type: not-regex
+      value: '(^|\n)\s*(public\s+)?(class|interface)\s+\w*(UseCase|Port|Adapter)\b'
+    - type: llm-rubric
+      value: 'Pass only if the answer explains the Clean Architecture skill is not activated because project instructions do not explicitly state Clean Architecture or hexagonal/ports-and-adapters, and it avoids introducing ports, adapters, interactors, or use cases speculatively.'
+  metadata:
+    id: java-clean-architecture:activation-guard-negative
+    skill: java-clean-architecture
+    kind: apply

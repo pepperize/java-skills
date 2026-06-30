@@ -1,0 +1,40 @@
+- description: java-readable-code:optional-parameter
+  prompts:
+    - review-code
+  vars:
+    skill: file://../java-readable-code/SKILL.md
+    code: |
+      import java.util.List;
+      import java.util.Optional;
+
+      class ProductSearchService {
+
+          List<Product> findProducts(Optional<String> countryCode) {
+              return countryCode
+                  .map(this::findProductsForCountry)
+                  .orElseGet(this::findAllProducts);
+          }
+
+          private List<Product> findProductsForCountry(String countryCode) {
+              throw new UnsupportedOperationException();
+          }
+
+          private List<Product> findAllProducts() {
+              throw new UnsupportedOperationException();
+          }
+      }
+  assert:
+    - type: icontains
+      value: Optional
+    - type: icontains
+      value: parameter
+    - type: regex
+      value: '[Oo]verload|[Nn]ull|[Nn]ullable|[Dd]efault|[Cc]oncrete operations|[Ss]eparate concrete operations|[Ll]ocal API'
+    - type: not-regex
+      value: '\b(class|interface)\s+\w*([Uu]til|[Uu]tils|[Uu]tility)\b'
+    - type: llm-rubric
+      value: 'Pass only if the review warns against Optional as a method parameter and proposes a local API shape such as overloads or explicit nullable/default handling without adding a broad utility class.'
+  metadata:
+    id: java-readable-code:optional-parameter
+    skill: java-readable-code
+    kind: review

@@ -1,0 +1,31 @@
+description: Practical evals for Java agent skills
+
+env:
+  EVAL_PROVIDER: "{{ env.PROMPTFOO_EVAL_PROVIDER | default('file://providers/codex-cli-auth.mjs', true) }}"
+  GRADER_PROVIDER: "{{ env.PROMPTFOO_GRADER_PROVIDER | default(env.PROMPTFOO_EVAL_PROVIDER | default('file://providers/codex-cli-auth.mjs', true), true) }}"
+  CODEX_MODEL: "{{ env.PROMPTFOO_CODEX_MODEL | default('gpt-5.5', true) }}"
+
+prompts:
+  - id: file://prompts/apply-skill.md
+    label: apply-skill
+  - id: file://prompts/review-code.md
+    label: review-code
+
+providers:
+  - id: "{{ env.EVAL_PROVIDER }}"
+    config: &codex_config
+      working_dir: ..
+      model: "{{ env.CODEX_MODEL }}"
+      sandbox_mode: read-only
+      approval_policy: never
+      network_access_enabled: false
+      web_search_enabled: false
+
+defaultTest:
+  options:
+    provider:
+      id: "{{ env.GRADER_PROVIDER }}"
+      config: *codex_config
+
+tests:
+  - file://cases/**/*.yaml

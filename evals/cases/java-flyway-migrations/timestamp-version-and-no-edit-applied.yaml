@@ -1,0 +1,27 @@
+- description: java-flyway-migrations:timestamp-version-and-no-edit-applied
+  prompts:
+    - apply-skill
+  vars:
+    skill: file://../java-flyway-migrations/SKILL.md
+    task: |
+      We need to add a nullable short_description column to product.
+      V20260401_0900__create_product.sql is already applied in production.
+      Recommend the migration filename and verification. Use a concrete example filename.
+      Also say whether to create a migration for a separate code-only mapping change that does not change the database schema.
+  assert:
+    - type: regex
+      value: 'V20[0-9]{6}_[0-9]{4}__[a-z0-9_]+\.sql'
+    - type: not-regex
+      value: '\bV[0-9]+__[a-z0-9_]+\.sql'
+    - type: regex
+      value: '([Dd]o not|[Dd]on.t|[Mm]ust not|[Ss]hould not)\s+edit.*already[- ]applied|already[- ]applied.*([Dd]o not|[Dd]on.t|[Mm]ust not|[Ss]hould not)\s+edit'
+    - type: regex
+      value: 'Flyway\s+(validation|validate)|startup|Spring context'
+    - type: regex
+      value: '([Nn]o|[Dd]o not|[Dd]on.t|[Ss]hould not).{0,80}migration.{0,140}(no database schema change|no schema change|code-only)|([Cc]ode-only|no database schema change|no schema change).{0,140}([Nn]o|[Dd]o not|[Dd]on.t|[Ss]hould not).{0,80}migration'
+    - type: llm-rubric
+      value: 'Pass only if the answer adds a new timestamp-named migration instead of editing the applied migration, mentions Flyway validation/startup verification, and says not to create a migration when there is no database schema change.'
+  metadata:
+    id: java-flyway-migrations:timestamp-version-and-no-edit-applied
+    skill: java-flyway-migrations
+    kind: apply

@@ -35,7 +35,8 @@ description: Use when adding or changing Java tests, fixing failing tests, doing
 
 - Prefer a parameterized test when multiple tests exercise the same behavior, vary only input data, and assert the same outcome or violation path.
 - For Bean Validation tests, group invalid values for the same property into one parameterized test, such as `givenInvalidRegionCode_shouldFailValidation`.
-- Use the simplest source that expresses the cases: `@NullSource`, `@EmptySource`, `@ValueSource`, or `@CsvSource` before `@MethodSource`.
+- Use the simplest source that expresses the cases: `@NullSource`, `@EmptySource`, `@NullAndEmptySource`, `@ValueSource`, or `@CsvSource` before `@MethodSource`.
+- Prefer `@NullAndEmptySource` when null and empty values exercise the same behavior; use separate `@NullSource` and `@EmptySource` only when those cases need different setup or expectations.
 - Do not fold cases into a parameterized test when setup becomes less readable, such as null map values requiring mutable map construction.
 - Name the test after the shared behavior, not every individual case.
 

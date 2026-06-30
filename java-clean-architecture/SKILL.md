@@ -12,6 +12,7 @@ Before applying this skill, check the project's main instruction file such as `A
 Use this skill only when that file explicitly states the project uses Clean Architecture.
 
 If the project does not explicitly state Clean Architecture, do not apply this skill.
+Say that the Clean Architecture skill is not activated for this project, explain that the main project instructions do not explicitly state Clean Architecture, and do not introduce or show `UseCase`, `Port`, or `Adapter` classes or interfaces even as examples.
 
 ## Boundaries
 
