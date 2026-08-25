@@ -49,6 +49,7 @@ After making Java code, test, or skill changes, review the diff before the final
 - Use `java-solid-review` for design, responsibility, SOLID, code-smell, and refactoring concerns.
 - Use `java-readable-code` for naming, guard clauses, `Optional`, factories, utilities, and readability.
 - Use `java-testing-style` for all test naming, mocks, unit/integration boundaries, assertions, layout, and verification scope.
+- Use `java-application-security` for input validation, regex safety, and other application-security-sensitive code paths.
 - Use `java-logging-exceptions`, `java-spring-security`, and `java-flyway-migrations` when changes touch those areas.
 - Use `java-clean-architecture` and `java-ddd-architecture` only when this project's instructions explicitly state those architectures.
 - Before finalizing, review new or changed helper methods with `java-readable-code`.

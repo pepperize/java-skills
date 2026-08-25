@@ -17,8 +17,22 @@ description: Use when writing, refactoring, or reviewing Java production code ar
 
 - Do not use `org.springframework.util.Assert` in application, domain, or service code.
 - Prefer explicit guard clauses with normal `if` statements and meaningful exceptions.
-- At API boundaries, prefer Bean Validation annotations where appropriate.
 - Inside business logic, prefer explicit checks over assertion utilities.
+
+## Validation Placement
+
+At API boundaries, prefer Bean Validation annotations for request-shape constraints such as nullness, blank strings, size, simple patterns, enum values, nested DTO validation, and other request binding concerns.
+
+Do not introduce predicate or specification classes merely to wrap simple Bean Validation rules, one-off null/blank/range checks, or controller-specific request syntax.
+
+Consider a named predicate, specification, policy, or validator only when the validation is non-trivial and at least one of these is true:
+
+- The rule must be applied outside the controller/API boundary, such as generated data, persisted data, infrastructure keys, filenames, external-system data, or reused application flows.
+- The rule is not readable or maintainable as annotations alone.
+- The rule has a stable domain or technical name that makes the caller clearer.
+- The rule is security-sensitive and benefits from isolated focused tests.
+
+Keep predicate and specification classes side-effect free. They should answer the validation question and leave exception choice, HTTP mapping, logging, and recovery decisions to the caller that owns that boundary.
 
 ## Factories
 

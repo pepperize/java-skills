@@ -13,6 +13,7 @@ description: Use when adding or changing Java tests, fixing failing tests, doing
 - Name the observed value `actual`.
 - Use JUnit Jupiter assertions from `org.junit.jupiter.api.Assertions`; do not introduce AssertJ unless the project requires it or the user asks for it.
 - Keep assertions simple and readable.
+- Do not add tests for unchanged existing behavior solely because an acceptance criterion mentions it. Test the regression risk introduced by the change at the boundary where the new composition occurs, and rely on existing collaborator contracts unless those contracts or their integration changed.
 
 ## Unit Tests
 
@@ -22,14 +23,31 @@ description: Use when adding or changing Java tests, fixing failing tests, doing
 - Use real collaborators only when they are intentionally part of the behavior under test and do not turn the test into a boundary integration test.
 - Prefer explicit assertions and interaction verifications over indirect failure-by-missing-stub setups.
 - In interaction-based tests, verify the end of the signal path at the relevant boundary; verify intermediate interactions only when they are the behavior under test.
+- Prefer direct value verification such as `verify(client).send(expectedRequest)` when the argument has meaningful value equality and the expected value is easy to construct. Use `ArgumentCaptor` or `argThat` only when direct equality is unavailable, partial matching is clearer, or the captured argument supports multiple observations.
 - Do not mix state/assertion-style and interaction-style verification for the same behavior in one unit test.
 
 ## Test Layout
 
+- When `@Nested` classes identify the method under test, use UpperCamelCase class names such as `Init` or `Read`, never method-style lowercase names such as `init` or `read`.
+- When test data represents the same concept as a production value, use the same domain-oriented variable name unless the test needs to distinguish expected, actual, or multiple variants.
 - Prefer code locality over front-loaded variable blocks. Create inputs, expected values, and intermediates near the `when(...)`, act step, or assertion that uses them.
 - Do not split setup into a front-loaded data block followed by a separate stubbing block. Keep setup in execution order.
 - Use empty lines only between major blocks such as Arrange/Act/Assert or Given/When/Then.
 - For repeated interactions such as loop iterations, order setup in the same sequence as the code under test.
+
+## Exception Assertions
+
+- When using `assertThrows` or `assertThrowsExactly` for an unchecked exception, keep the assertion lambda focused on exactly one invocation that may throw: the operation under test.
+- Evaluate unrelated constructors, factories, collection creation, accessors, argument-building calls, and chained calls before the assertion.
+- Keep extracted inputs close to the assertion so the exception source remains obvious.
+- Keep a constructor or factory inside the lambda only when that construction is itself the operation under test.
+- Do not hide multiple invocations in a helper merely to satisfy static analysis.
+
+```java
+var locales = List.of(german);
+
+var actual = assertThrows(RuntimeException.class, () -> sut.load(locales));
+```
 
 ## Parameterized Tests
 
@@ -76,3 +94,7 @@ Before broadening test scope:
 - Run the narrowest affected test classes first.
 - Do not run broad suites when known environment-dependent tests are unrelated to the change.
 - If a focused test failure exposes a wrong assumption, fix the production assumption first instead of adding test-only branches.
+
+## Required Pre-Final Test Review
+
+- Inspect every added or changed unchecked-exception assertion. Keep its lambda limited to the direct operation under test, with potentially throwing setup calls evaluated beforehand.

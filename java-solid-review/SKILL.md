@@ -49,6 +49,7 @@ description: Reviews and guides Java code for SOLID principles, responsibility b
 - Keep ports and interfaces focused on what their callers actually need.
 - Split interfaces when implementations are forced to stub, ignore, or reject unrelated methods.
 - Treat module, component, and port boundaries as contracts; expose caller-needed behavior and semantics, not implementation structure.
+- Interface methods should express what callers need, not how one implementation happens to fulfill it. Do not add parameters, return shapes, methods, or exceptions to an interface solely because one implementation needs collaborator data or technical context. Prefer moving that dependency into the implementation, composing with another port or collaborator, or introducing a purpose-named application input only when the caller truly owns that choice.
 
 ### Dependency Inversion
 

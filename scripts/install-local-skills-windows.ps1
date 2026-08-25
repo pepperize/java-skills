@@ -15,6 +15,7 @@ $skills = @(
     "java-solid-review",
     "java-agent-instructions",
     "java-logging-exceptions",
+    "java-application-security",
     "java-domain-clarification",
     "java-spring-security",
     "java-flyway-migrations"

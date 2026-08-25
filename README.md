@@ -9,6 +9,7 @@ Reusable Java agent skills for applying company engineering standards across Jav
 - `java-solid-review`: SOLID, responsibility-boundary, code-smell, and pragmatic OO design review for Java production code. Testing guidance stays delegated to `java-testing-style`.
 - `java-agent-instructions`: installs or updates project-level `AGENTS.md`/`CLAUDE.md` instructions for Java skill self-review.
 - `java-logging-exceptions`: logging and exception placement guidance for domain-relevant failures and technical boundaries.
+- `java-application-security`: application security guidance for external-input validation and regex safety.
 - `java-domain-clarification`: clarification workflow before domain-sensitive implementation changes.
 - `java-clean-architecture`: Clean Architecture guidance for Java projects. This skill is guarded and should only be used when the project's main instruction file explicitly states Clean Architecture.
 - `java-ddd-architecture`: DDD guidance for Java projects, including Spring configuration placement and Spring web boundary naming. This skill is guarded and should only be used when the project's main instruction file explicitly states DDD or Domain-Driven Design.

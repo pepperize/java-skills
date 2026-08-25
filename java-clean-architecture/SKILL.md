@@ -22,6 +22,8 @@ Keep business rules out of technical adapters. Keep framework, transport, persis
 
 Prefer dependency direction toward the domain or application core. Outer adapters should depend on ports and application models, not the other way around.
 
+Ports should expose application-needed capabilities, not adapter assembly details. If a parameter exists only so a specific adapter can combine data from another source, inject that source into the adapter instead of leaking it through the port.
+
 ## Use Cases
 
 Use cases should orchestrate business flow and delegate technical concerns to ports or cohesive collaborators.

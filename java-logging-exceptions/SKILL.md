@@ -19,6 +19,8 @@ Before finalizing logging changes:
 - Extract collaborators only for formatting, encoding, mapping, or classification, not to hide domain-relevant logging.
 - Treat external data, exception values, validation paths, and rejected values as unsafe before logging.
 - Encode unsafe log values at the last formatting boundary before they are passed to the logger.
+- Do not pass raw dynamic values into logger placeholders or concatenated log messages when the value may come from requests, persisted data, external systems, files, config, generated URLs, S3 keys, exception messages, or validation failures. Validate inputs at the boundary where feasible, but also encode unsafe log values at the final logging boundary with an approved cleanser such as `Encode.forJava(...)` or a project-approved `encode...ForLog` helper. Keep the original value for domain, storage, and API behavior; only encode the value passed to `log.*`. Keep `Throwable` arguments unencoded and last.
+- When adding a reusable log encoder, cover CR, LF, CRLF, tabs, quotes, and script-like payloads in focused unit tests.
 - Name extracted log-formatting methods with verb phrases such as `format...`, `encode...`, or `create...`.
 
 ## Exceptions
