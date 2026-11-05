@@ -35,6 +35,97 @@ description: Use when adding or changing Java tests, fixing failing tests, doing
 - Use empty lines only between major blocks such as Arrange/Act/Assert or Given/When/Then.
 - For repeated interactions such as loop iterations, order setup in the same sequence as the code under test.
 
+### Identify And Declare The Subject Under Test
+
+- Name the primary object whose behavior is being tested `sut`, in both unit and integration tests.
+- Apply this whether the object is constructed directly, injected by Spring, or created with `@InjectMocks`.
+- Give collaborators descriptive names that identify their responsibilities. Domain fixtures and expected or actual results are not the SUT.
+- Declare `@Mock` and `@Spy` collaborators before the `@InjectMocks` field, so dependencies appear before the subject under test.
+
+Bad: the subject has a generic name and appears before its collaborators.
+
+```java
+@InjectMocks
+private OrderService service;
+
+@Mock
+private OrderRepository orderRepository;
+```
+
+Good: collaborators appear first and the subject is named `sut`.
+
+```java
+@Mock
+private OrderRepository orderRepository;
+
+@InjectMocks
+private OrderService sut;
+```
+
+The same naming rule applies to Spring-injected subjects in integration tests.
+
+Bad:
+
+```java
+@Autowired
+private OrderRepository repository;
+```
+
+Good:
+
+```java
+@Autowired
+private OrderRepository sut;
+```
+
+### Keep Scenario Setup Inside Each Test
+
+- Each test must explicitly arrange its own domain objects, persisted records, and scenario-specific stubs.
+- Do not create those fixtures in `@BeforeEach`, `@BeforeAll`, superclass setup, or test-instance field initializers. Do not pass them implicitly through mutable test fields.
+- Reuse builders, factories, and focused setup helpers, but call them explicitly from each test and return the fixtures as local variables. Keep object construction and persistence separate as described under Persistent Test Data.
+- Reserve lifecycle methods for infrastructure lifecycle and cleanup, such as starting or resetting external resources.
+- Being recreated before every test does not make a fixture self-contained. Execution independence and explicit scenario setup are separate requirements.
+
+Bad: the test depends on a category prepared elsewhere.
+
+```java
+private ProductCategory productCategory;
+
+@BeforeEach
+void persistProductCategory() {
+    var category = productFactory.createProductCategory();
+    productCategory = productCategoryRepository.save(category);
+}
+
+@Test
+void givenProductCategory_shouldReloadCategoryReference() {
+    var product = productFactory.create(42L, productCategory);
+
+    sut.save(product);
+    flushAndClear();
+
+    var actual = sut.findById(product.getId()).orElseThrow();
+    assertEquals(productCategory.getId(), actual.getProductCategory().getId());
+}
+```
+
+Good: the test explicitly creates and persists its prerequisite.
+
+```java
+@Test
+void givenProductCategory_shouldReloadCategoryReference() {
+    var category = productFactory.createProductCategory();
+    var productCategory = productCategoryRepository.save(category);
+    var product = productFactory.create(42L, productCategory);
+
+    sut.save(product);
+    flushAndClear();
+
+    var actual = sut.findById(product.getId()).orElseThrow();
+    assertEquals(productCategory.getId(), actual.getProductCategory().getId());
+}
+```
+
 ## Exception Assertions
 
 - When using `assertThrows` or `assertThrowsExactly` for an unchecked exception, keep the assertion lambda focused on exactly one invocation that may throw: the operation under test.
@@ -97,4 +188,6 @@ Before broadening test scope:
 
 ## Required Pre-Final Test Review
 
+- Identify the primary object under test and verify its field or local variable is named `sut`. Verify `@Mock` and `@Spy` collaborators are declared before `@InjectMocks`.
+- Inspect lifecycle methods, superclass setup, and test fields for hidden scenario setup. Move domain fixtures, persisted prerequisites, and scenario-specific stubs into the tests that use them.
 - Inspect every added or changed unchecked-exception assertion. Keep its lambda limited to the direct operation under test, with potentially throwing setup calls evaluated beforehand.
