@@ -18,7 +18,11 @@ $skills = @(
     "java-application-security",
     "java-domain-clarification",
     "java-spring-security",
-    "java-flyway-migrations"
+    "java-flyway-migrations",
+    "java-api-endpoints",
+    "java-request-validation",
+    "java-templating",
+    "java-authentication-security"
 )
 
 New-Item -ItemType Directory -Force -Path $skillsDir | Out-Null

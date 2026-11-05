@@ -1,0 +1,19 @@
+- description: java-agent-instructions:canonical-template-and-review-routing
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-agent-instructions/SKILL.md
+    task: Describe how to update project instructions after adding a task-created untracked Java class
+      and changing a REST creation response. The installer and SKILL.md currently contain separate block
+      copies. Explain how to avoid drift and route review. Do not install into a real project for this
+      exercise.
+    reference: file://../java-agent-instructions/assets/java-skill-self-review.md
+  assert:
+  - type: llm-rubric
+    value: Pass only if one canonical asset template is used by the installer and skill, task-created
+      untracked files join staged/unstaged review, readable naming/design/API validation routes are identified,
+      and architecture activation is not inferred. Do not copy the whole policy catalog into project instructions.
+  metadata:
+    id: java-agent-instructions:canonical-template-and-review-routing
+    skill: java-agent-instructions
+    kind: apply

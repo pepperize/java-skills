@@ -16,6 +16,10 @@ skills=(
   java-domain-clarification
   java-spring-security
   java-flyway-migrations
+  java-api-endpoints
+  java-request-validation
+  java-templating
+  java-authentication-security
 )
 
 mkdir -p "$skills_dir"

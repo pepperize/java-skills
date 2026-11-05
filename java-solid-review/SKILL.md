@@ -1,6 +1,6 @@
 ---
 name: java-solid-review
-description: Reviews and guides Java code for SOLID principles, responsibility boundaries, code smells, and pragmatic OO design. Use when reviewing, refactoring, or designing Java classes, services, ports, adapters, factories, policies, or collaborators for maintainability and testability.
+description: Review Java design and self-review non-trivial implementations and refactors for concrete responsibility, coupling, encapsulation, contract, and simplicity risks using SOLID and related engineering principles.
 ---
 
 # Java SOLID Review
@@ -9,6 +9,7 @@ description: Reviews and guides Java code for SOLID principles, responsibility b
 - Treat SOLID and object-oriented design rules as heuristics, not automatic mandates.
 - Prefer maintainable, testable, intention-revealing, simple local designs over pattern-heavy code or hypothetical abstractions and optimizations.
 - Apply project conventions and more specific Java skills first when they are relevant.
+- Report only principles that explain a material observed risk. Do not manufacture findings, turn preferences into defects, or print a principle-by-principle checklist. A review may find no relevant violation.
 
 ## Skill Precedence
 - For tests, use `java-testing-style`. This skill must not override its rules for test naming, mocking style, unit versus integration boundaries, assertions, layout, or verification scope.
@@ -22,6 +23,10 @@ description: Reviews and guides Java code for SOLID principles, responsibility b
 3. Check for SOLID violations, hidden assumptions, or mixed concerns that create real change, testability, or comprehension risk.
 4. Prefer the simplest local or vertical-slice refactor that removes the risk without changing behavior.
 5. Verify with the narrowest credible test scope, following `java-testing-style`.
+
+For explicit design reviews and non-trivial implementation self-review, read [engineering principles](references/engineering-principles.md). It adds Java examples and counterexamples for duplicated knowledge, simplicity, orchestration, information hiding, collaborator knowledge, and implementation reflecting design. Select the most precise principle for each risk rather than reporting overlapping findings.
+
+Challenge every proposed improvement with KISS and YAGNI: the fix must make current behavior easier to understand or change without speculative layers, registries, interfaces, or fragmented one-line helpers.
 
 ## SOLID Checks
 
@@ -99,3 +104,9 @@ When reviewing code, report findings in severity order with file and line refere
 - The affected responsibility or SOLID principle.
 - The smallest practical fix.
 - The test impact, expressed according to `java-testing-style`.
+
+Name the principle when it clarifies a material finding, for example **SRP — Single Responsibility Principle**, rather than saying only that a class does too much. Use one finding for one underlying issue even when several principles apply.
+
+## Implementation Self-Review
+
+After a non-trivial implementation or refactor, inspect the complete task change set, including new files, using the same workflow. Check for duplicated knowledge, unnecessary abstractions, mixed responsibilities and abstraction levels, leaking representations, surprising behavior, and contracts shaped by infrastructure details. Fix material issues within the requested scope before finalizing. If no meaningful finding remains, say so without enumerating passed or inapplicable principles.

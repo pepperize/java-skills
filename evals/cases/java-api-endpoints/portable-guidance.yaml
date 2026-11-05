@@ -1,0 +1,42 @@
+- description: java-api-endpoints:persisted-resource-response
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-api-endpoints/SKILL.md
+    task: Correct this completed REST creation. UserService must return a public DTO from the repository
+      result with its generated identifier. Use existing MVC serialization/advice and canonical /api/users/{id}
+      URLs under the configured context path. Omit secrets. No asynchronous work is pending.
+    code: |-
+      @PostMapping("/api/users")
+      ResponseEntity<?> postUsers(@Valid @RequestBody CreateUserRequest request) {
+          userService.create(request);
+          return ResponseEntity.accepted().body(Map.of("status", "pending"));
+      }
+    reference: file://../java-api-endpoints/references/user-endpoint.md
+  assert:
+  - type: llm-rubric
+    value: Pass only if completed creation returns 201, canonical member Location and public DTO derived
+      from persisted values, with independent input/output contracts and no secrets. Reuse ResponseEntity
+      or existing response infrastructure without adding a responder framework, mandatory flush, or claiming
+      save commits an outer transaction.
+  metadata:
+    id: java-api-endpoints:persisted-resource-response
+    skill: java-api-endpoints
+    kind: apply
+- description: java-api-endpoints:traditional-html-contract
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-api-endpoints/SKILL.md
+    task: Review an explicitly required traditional HTML registration POST. It redisplays safe values
+      on errors and returns 303 after RegistrationService.register succeeds. Should it be renamed to REST
+      User CRUD and changed to 201 with a JSON body? Explain the boundary.
+  assert:
+  - type: llm-rubric
+    value: Pass only if the traditional HTML capability naming and error/redirect contract remain, and
+      the response does not impose REST creation DTOs, 201 or a JavaScript-only default. Distinguish a
+      rendered page from a form actually calling REST.
+  metadata:
+    id: java-api-endpoints:traditional-html-contract
+    skill: java-api-endpoints
+    kind: apply

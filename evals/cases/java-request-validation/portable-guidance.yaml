@@ -1,0 +1,43 @@
+- description: java-request-validation:native-binding-and-domain-invariants
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-request-validation/SKILL.md
+    task: Implement the HTTP input boundary for CreateBookingRequest and explain validation ownership.
+      quantity must be positive; the application already enforces available capacity transactionally for
+      HTTP and batch callers. Preserve its distinct CreateBookingCommand and existing 400 error advice.
+      Do not build custom middleware.
+    project_instructions: Spring MVC with Jakarta Validation. Published constraint failures are HTTP 400.
+      A transport request maps to an application-owned CreateBookingCommand.
+  assert:
+  - type: llm-rubric
+    value: Pass only if native typed binding and Bean Validation are used, invalid request input cannot
+      reach business work, the meaningful request-command mapping is preserved, transactional capacity
+      remains protected for all callers, and no custom hydrator, duplicate syntax pass, or incidental
+      422 migration is introduced.
+  metadata:
+    id: java-request-validation:native-binding-and-domain-invariants
+    skill: java-request-validation
+    kind: apply
+- description: java-request-validation:problem-locations-and-safe-diagnostics
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-request-validation/SKILL.md
+    task: 'Design error mapping for JSON fields renamed by the serializer: bean field postalCode maps
+      to postal_code inside addresses[0]. A separate submitted field is named a/b~c. Give plain JSON Pointer
+      locations, clarify root/query locations, and preserve HTTP 400. Reject raw passwords in diagnostics.'
+    reference: file://../java-request-validation/references/error-contracts.md
+  assert:
+  - type: contains
+    value: /addresses/0/postal_code
+  - type: contains
+    value: /a~1b~0c
+  - type: llm-rubric
+    value: Pass only if submitted names and indexes are preserved, locations include /addresses/0/postal_code
+      and /a~1b~0c, plain-pointer root is the empty string, query errors are not body pointers, raw secrets
+      are excluded, and 400 is preserved rather than forced to 422.
+  metadata:
+    id: java-request-validation:problem-locations-and-safe-diagnostics
+    skill: java-request-validation
+    kind: apply

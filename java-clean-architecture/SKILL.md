@@ -16,6 +16,8 @@ Say that the Clean Architecture skill is not activated for this project, explain
 
 ## Boundaries
 
+When this skill is active for an architecture/design review, also apply `java-solid-review` for material cross-cutting risks without overriding the project's architectural boundaries.
+
 Preserve clear boundaries between use cases, domain/application logic, ports, and adapters.
 
 Keep business rules out of technical adapters. Keep framework, transport, persistence, and client details out of application use cases.
@@ -33,6 +35,8 @@ Use cases should receive already-shaped application input. Keep transport and re
 Avoid nullable parameter combinations inside a use case to choose between request modes. Prefer separate use-case methods, a purpose-named command object, or a small controller/API adapter decision.
 
 Keep domain and application invariants in the application layer when they are independent of HTTP transport and must hold for every caller.
+
+Use `java-request-validation` for entry-boundary binding and validation. Avoid a second pass over already-validated request syntax. Keep transport-specific input models out of the core; do not remove a meaningful application mapping solely to share a DTO.
 
 Avoid letting use cases accumulate unrelated creation, conversion, logging, key formatting, or client-specific responsibilities.
 

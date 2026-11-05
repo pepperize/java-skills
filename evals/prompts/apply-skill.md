@@ -3,6 +3,11 @@ You are evaluating whether a Java agent skill is followed.
 Skill:
 {{ skill }}
 
+{% if reference %}
+Relevant skill reference:
+{{ reference }}
+{% endif %}
+
 Task:
 {{ task }}
 

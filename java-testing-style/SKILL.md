@@ -157,6 +157,14 @@ var actual = assertThrows(RuntimeException.class, () -> sut.load(locales));
 - Put integration tests in `src/test-integration/java` or `src/test-it/java`, name classes with an `IT` suffix, and avoid `MvcTest` or `IntegrationTest` suffixes.
 - Tests using `@SpringBootTest`, `@DataJpaTest`, `MockMvc`, Testcontainers, real repositories, or other framework/infrastructure boundaries belong in `src/test-integration/java` or `src/test-it/java`.
 
+## Security Integration Coverage
+
+When authentication, authorization, or protected-route composition changes, exercise the affected real filter chain and method-security boundary. Cover relevant allowed/denied capabilities, anonymous outcomes, CSRF for cookie-authenticated browser writes, tenant/object scope, and public-route allowlists. If composition changes, inventory the affected route mappings and matching security chains; annotation presence alone is insufficient.
+
+For authentication lifecycle changes, use `java-authentication-security` and the project's credential policy. Select applicable scenarios: wrong/unknown/disabled accounts with equal public failure output, limiter boundaries, session rotation and revocation, idle/absolute expiry, cookie attributes, expiring single-use recovery tokens, concurrent token consumption, and credential upgrades preserving legacy compatibility. Use a controllable `Clock` for time boundaries. Verify intended real-or-dummy verification without brittle wall-clock comparisons.
+
+For request binding and API response changes, use `java-request-validation` and `java-api-endpoints`. Exercise the real binder, validator metadata, serializer, and error handler: invalid input must not invoke business work; outputs must omit secrets and use authoritative persisted values. Reuse existing collaborator coverage unless the changed composition introduces a new risk.
+
 ## Persistent Test Data
 
 - Arrange persistent state through the narrowest existing API that owns the responsibility for that state.

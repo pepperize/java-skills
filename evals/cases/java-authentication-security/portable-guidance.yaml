@@ -1,0 +1,40 @@
+- description: java-authentication-security:legacy-truncation-migration
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-authentication-security/SKILL.md
+    task: Plan an encoder migration. Legacy bcrypt accepted passwords longer than its significant 72-byte
+      prefix. A login supplies a matching prefix with a different suffix. New credentials use an encoder
+      supporting the full accepted Unicode input. Can successful legacy verification automatically bind
+      that supplied full input into a new hash? Preserve existing login acceptance and explain the safe
+      path.
+    reference: file://../java-authentication-security/references/password-policy.md
+  assert:
+  - type: llm-rubric
+    value: Pass only if historical verification is preserved without applying new registration policy,
+      an unverified suffix is not silently bound during upgrade, and an explicit change/reset path is
+      required for this ambiguous legacy case. Do not invent ad hoc pre-hashing or claim all bcrypt implementations
+      silently truncate.
+  metadata:
+    id: java-authentication-security:legacy-truncation-migration
+    skill: java-authentication-security
+    kind: apply
+- description: java-authentication-security:idle-absolute-and-reset-revocation
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-authentication-security/SKILL.md
+    task: Review session/recovery behavior. Login currently sets a cookie but does not invoke existing
+      fixation protection. Each request resets authenticatedAt along with lastActivity. Logout only clears
+      the cookie. Reset tokens are read then marked consumed in separate transactions. Show the lifecycle
+      corrections using established Spring infrastructure.
+  assert:
+  - type: llm-rubric
+    value: Pass only if framework fixation handling is used, immutable authentication time and absolute
+      expiry are distinct from activity/idle expiry, logout invalidates server state, token use is atomic
+      with the protected change, and reset invalidates relevant sibling tokens/sessions. Tests use a controllable
+      clock and concurrent-token scenario rather than timing equality.
+  metadata:
+    id: java-authentication-security:idle-absolute-and-reset-revocation
+    skill: java-authentication-security
+    kind: apply

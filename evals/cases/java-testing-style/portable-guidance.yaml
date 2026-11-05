@@ -1,0 +1,18 @@
+- description: java-testing-style:real-security-boundary
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-testing-style/SKILL.md
+    task: A protected-route change has a unit test constructing the controller directly and checking for
+      @PreAuthorize by reflection. Plan the narrowest credible regression verification for anonymous,
+      missing-capability, allowed and cookie-authenticated POST behavior. Do not add a broad unrelated
+      suite.
+  assert:
+  - type: llm-rubric
+    value: Pass only if real filter-chain and enabled method-security integration is exercised, denial
+      prevents protected work, CSRF is covered for the cookie-authenticated write, and tests use Java
+      integration layout and sut conventions rather than treating annotation presence as proof.
+  metadata:
+    id: java-testing-style:real-security-boundary
+    skill: java-testing-style
+    kind: apply

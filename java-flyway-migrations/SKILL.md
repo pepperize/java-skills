@@ -5,6 +5,8 @@ description: Applies company Flyway migration conventions for Java projects. Use
 
 # Java Flyway Migrations
 
+Use this skill for projects using Flyway. Preserve the application's established migration system; do not introduce Flyway alongside another system or convert its migrations merely to apply this skill.
+
 ## Creation Rule
 
 Do not add database migrations unless they are explicitly needed by the requested change or explicitly requested by the user.

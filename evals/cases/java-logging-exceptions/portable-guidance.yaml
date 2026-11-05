@@ -1,0 +1,48 @@
+- description: java-logging-exceptions:narrow-construction-catch
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-logging-exceptions/SKILL.md
+    task: Correct catch ownership. constructRequest owns MissingFieldException for absent raw fields.
+      validator and downstream can also raise that exception for unrelated internal failures. Only construction
+      failure maps to a client response.
+    code: |-
+      try {
+          var request = constructRequest(rawBody);
+          validator.validate(request);
+          return downstream.handle(request);
+      } catch (MissingFieldException exception) {
+          return badRequest();
+      }
+  assert:
+  - type: llm-rubric
+    value: Pass only if the catch surrounds construction alone, allows the helper to throw its owned exception,
+      and leaves validator/downstream outside the catch. Do not catch all RuntimeException or convert
+      unrelated failures into malformed input.
+  metadata:
+    id: java-logging-exceptions:narrow-construction-catch
+    skill: java-logging-exceptions
+    kind: apply
+- description: java-logging-exceptions:proven-conflict-not-all-integrity-errors
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-logging-exceptions/SKILL.md
+    task: Review this proposed conflict mapping. A unique email constraint and a separate non-null constraint
+      exist. The outer Spring transaction can fail only at commit. Explain where classification/translation
+      must happen and what evidence it needs.
+    code: |-
+      try {
+          return userRepository.save(user);
+      } catch (DataIntegrityViolationException exception) {
+          throw new UserAlreadyExistsException("Email exists", exception);
+      }
+  assert:
+  - type: llm-rubric
+    value: Pass only if the answer refuses to label every integrity failure as duplicate email, uses stable
+      constraint/classification evidence, preserves the cause, and handles commit-boundary visibility
+      without querying a failed transaction. Do not claim saveAndFlush commits an outer transaction.
+  metadata:
+    id: java-logging-exceptions:proven-conflict-not-all-integrity-errors
+    skill: java-logging-exceptions
+    kind: apply

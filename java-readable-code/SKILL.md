@@ -1,6 +1,6 @@
 ---
 name: java-readable-code
-description: Use when writing, refactoring, or reviewing Java production code around readability, responsibilities, naming, Optional usage, guard clauses, factories, utilities, or test-only production code.
+description: Use when writing, refactoring, or reviewing Java production code around readability, orchestration, responsibility-based class and dependency naming, Optional usage, guard clauses, factories, or test-only production code.
 ---
 
 # Java Readable Code
@@ -12,6 +12,22 @@ description: Use when writing, refactoring, or reviewing Java production code ar
 - Avoid broad utility classes that mix unrelated concerns such as creation, mapping, conversion, logging, and key formatting; extract cohesive collaborators with narrow names instead.
 - Avoid passing non-trivial method calls directly as arguments when an intermediate variable would clarify intent. Name semantically important intermediate results.
 - Prefer simple, common words that non-native speakers can read without looking them up.
+
+## Orchestration And Local Operations
+
+Keep orchestration at one level of abstraction. Extract a complete meaningful operation, including its related checks, branching, and construction, instead of adding small predicates that leave the caller coordinating the same details.
+
+Prefer a private method when an operation belongs to one owner. Introduce a collaborator when an independent responsibility, actual reuse, complexity, or composition benefit justifies it. Returning an object does not by itself require a factory class. Leave ordinary expressions inline when extraction would only add indirection.
+
+For before/after Java examples, read [orchestration and composition](references/orchestration-and-composition.md) when refactoring complex orchestration or result construction. Local extraction must preserve input contracts and exception ownership under `java-request-validation` and `java-logging-exceptions`.
+
+## Dependency Names
+
+Name injected fields and constructor parameters after the declared type in lower camel case, retaining role suffixes: `userRepository`, `userDtoFactory`, `publicUrlGenerator`. Avoid plural resource names for single collaborators; use plurals for collections. When several dependencies share a type, use qualifiers that explain their roles, such as `billingClient` and `shippingClient`. Preserve framework-required and explicit project names.
+
+## Debuggable Composition
+
+Assign meaningful repository, service, and factory results to named locals before constructing an aggregate result so intermediate values are inspectable in an IDE or debugger. This develops the default intermediate-variable rule; it does not require extracting literals, existing variables, or every simple expression.
 
 ## Guard Clauses
 
@@ -34,9 +50,15 @@ Consider a named predicate, specification, policy, or validator only when the va
 
 Keep predicate and specification classes side-effect free. They should answer the validation question and leave exception choice, HTTP mapping, logging, and recovery decisions to the caller that owns that boundary.
 
+Use `java-request-validation` for binding, DTO ownership, and error responses. Avoid repeating request-shape validation after a validated boundary; preserve domain invariants that must hold for every caller. Do not introduce checks or abstractions for hypothetical entry points.
+
 ## Factories
 
-When a class mainly creates a returned object, prefer the Factory pattern: name the class after the product plus `Factory`, and name the main method `create(...)`.
+Identify the primary responsibility before choosing a class name. When that responsibility is constructing an object or object graph, name a justified collaborator after its product plus `Factory`, with a main `create(...)` operation. Reflection, cloning, or metadata interpretation are implementation details; they do not turn object construction into a `Generator` responsibility.
+
+This naming rule does not require a new class for every construction operation. Retrieval, validation, rendering, and scalar generation retain their own roles even when they return objects. Preserve framework contracts, explicit project terminology, and established Java factories such as `of(...)` and `from(...)`.
+
+For REST resource work, use `java-api-endpoints` for request/output contracts and HTTP responses. Follow existing Spring Data repository operation names; do not rename `findById` to `find` or invent unused CRUD methods to copy another language's conventions.
 
 ## Method Names
 
@@ -99,6 +121,16 @@ When changing a count type, update the cohesive model together instead of moving
 - Prefer `Optional` as a return type at absence-producing boundaries.
 - Avoid `Optional` as a method parameter. Resolve absence at the caller or boundary and pass a concrete domain object, explicit overload, or purpose-named value instead.
 
+## Immutability And Collection Ownership
+
+Prefer immutable data where domain and framework contracts allow, and unmodifiable collections at return and collaborator boundaries. Allow mutable local collections while building a result. Consumers treat supplied collections as read-only unless mutation is an explicit part of the contract; a consumer that needs its own modified version makes a local copy.
+
+Unmodifiable collections do not make their elements immutable. An unmodifiable view of a mutable backing collection is not an independent snapshot; choose the ownership and snapshot semantics the contract requires.
+
+Avoid redundant defensive copies when ownership already guarantees the required behavior. Return an appropriate unmodifiable result directly rather than copying it again at every layer. For large collections or measured hot paths, choose an explicit ownership strategy that limits copying; do not assume streams or immutability are inherently faster or slower.
+
+During refactoring, inspect consumers before changing collection mutability. Preserve established mutation contracts unless changing them is part of the requested work; an immutability preference alone does not authorize a behavior change.
+
 ## Collections And Optional
 
 - Do not return `Optional<List<T>>`, `Optional<Set<T>>`, or `Optional<Map<K, V>>` when an empty collection fully represents "nothing found".
@@ -114,9 +146,12 @@ Do not add production code only to make tests easier. Avoid test-only constructo
 
 Before finalizing Java code changes:
 
+- Review staged and unstaged diffs and task-created untracked Java files using `git status --short`; diffs alone omit new files.
+- For every new or renamed class, or class whose responsibility changed, check its primary responsibility, returned product, and name. Correct affected callers, tests, and documentation. Review injected dependency names and meaningful intermediate values.
 - Review every newly added or renamed method.
 - Classify each as accessor/property, boolean predicate, action/operation, or factory/construction helper.
 - Accessors may use noun names. Predicates should use `is`, `has`, `can`, `should`, or similar.
 - Action, operation, formatting, mapping, and helper methods must use verb phrases.
 - Remove helper methods that only hide one obvious call unless they enforce a real invariant or improve a repeated concept.
 - Check any new defensive branch against known domain/API assumptions. If the user or project states the value cannot occur, do not add handling for it without asking.
+- For non-trivial implementations and refactors, apply the implementation self-review in `java-solid-review` and fix material issues within scope.
