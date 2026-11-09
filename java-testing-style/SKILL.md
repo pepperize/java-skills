@@ -18,7 +18,9 @@ description: Use when adding or changing Java tests, fixing failing tests, doing
 ## Unit Tests
 
 - Default to London-style unit tests for application services, use cases, orchestration classes, ports, and clients.
-- Prefer mocking all collaborators, including simple configuration holders, when that keeps the SUT declarative with `@InjectMocks`.
+- Prefer `@ExtendWith(MockitoExtension.class)`, `@Mock` fields for shared collaborators, and `@InjectMocks` for the SUT as the standard unit-test setup. These annotations bring clarity by making collaborators and the subject under test immediately identifiable without manual wiring.
+- Prefer mocking all collaborators, including simple configuration holders, to keep the SUT declarative with `@InjectMocks`.
+- Reserve explicit SUT construction, such as a `getSut()` helper, for the uncommon case where an unmocked collaborator needs to be injected. Do not use it as the default when annotations can express the setup.
 - Avoid `@BeforeEach` methods that only wire dependencies into the SUT.
 - Use real collaborators only when they are intentionally part of the behavior under test and do not turn the test into a boundary integration test.
 - Prefer explicit assertions and interaction verifications over indirect failure-by-missing-stub setups.
@@ -78,51 +80,55 @@ Good:
 private OrderRepository sut;
 ```
 
+### Test Data Construction
+
+- Prefer direct object construction or instantiate existing project dummies inside each test. Follow the project's established dummy and test-data conventions.
+- Keep scenario-specific property changes and persistence calls visible in the test. Repeating a few straightforward constructors and setters is acceptable.
+- Do not introduce a test data factory, builder, or setup helper merely to wrap constructors and setters or remove a few repeated setup lines. Extract construction only when its complexity provides a concrete readability benefit.
+- Factory naming and dependency-injection guidance does not require extracting test setup into collaborators. A restriction on static helpers is not a reason to introduce an instance factory.
+
 ### Keep Scenario Setup Inside Each Test
 
 - Each test must explicitly arrange its own domain objects, persisted records, and scenario-specific stubs.
 - Do not create those fixtures in `@BeforeEach`, `@BeforeAll`, superclass setup, or test-instance field initializers. Do not pass them implicitly through mutable test fields.
-- Reuse builders, factories, and focused setup helpers, but call them explicitly from each test and return the fixtures as local variables. Keep object construction and persistence separate as described under Persistent Test Data.
+- When a builder, factory, or setup helper is justified by construction complexity, call it explicitly from each test and return the fixtures as local variables. Keep scenario-specific changes and persistence in the test.
 - Reserve lifecycle methods for infrastructure lifecycle and cleanup, such as starting or resetting external resources.
 - Being recreated before every test does not make a fixture self-contained. Execution independence and explicit scenario setup are separate requirements.
 
-Bad: the test depends on a category prepared elsewhere.
+Bad: the test depends on an article prepared elsewhere.
 
 ```java
-private ProductCategory productCategory;
+private WireArticle wireArticle;
 
 @BeforeEach
-void persistProductCategory() {
-    var category = productFactory.createProductCategory();
-    productCategory = productCategoryRepository.save(category);
+void createWireArticle() {
+    wireArticle = new WireArticle("wire-42");
+    wireArticle.setName("Test wire");
 }
 
 @Test
-void givenProductCategory_shouldReloadCategoryReference() {
-    var product = productFactory.create(42L, productCategory);
-
-    sut.save(product);
+void givenNewWireArticle_shouldReloadName() {
+    sut.save(wireArticle);
     flushAndClear();
 
-    var actual = sut.findById(product.getId()).orElseThrow();
-    assertEquals(productCategory.getId(), actual.getProductCategory().getId());
+    var actual = sut.findById(wireArticle.getId()).orElseThrow();
+    assertEquals("Test wire", actual.getName());
 }
 ```
 
-Good: the test explicitly creates and persists its prerequisite.
+Good: the test constructs its fixture locally and explicitly persists it.
 
 ```java
 @Test
-void givenProductCategory_shouldReloadCategoryReference() {
-    var category = productFactory.createProductCategory();
-    var productCategory = productCategoryRepository.save(category);
-    var product = productFactory.create(42L, productCategory);
+void givenNewWireArticle_shouldReloadName() {
+    var wireArticle = new WireArticle("wire-42");
+    wireArticle.setName("Test wire");
 
-    sut.save(product);
+    sut.save(wireArticle);
     flushAndClear();
 
-    var actual = sut.findById(product.getId()).orElseThrow();
-    assertEquals(productCategory.getId(), actual.getProductCategory().getId());
+    var actual = sut.findById(wireArticle.getId()).orElseThrow();
+    assertEquals("Test wire", actual.getName());
 }
 ```
 
@@ -170,7 +176,7 @@ For request binding and API response changes, use `java-request-validation` and 
 - Arrange persistent state through the narrowest existing API that owns the responsibility for that state.
 - Prefer existing services or use cases when setup must satisfy business rules, side effects, or cross-aggregate invariants.
 - Prefer repositories when the test only needs already-valid persisted entities and repository behavior is not the subject under test.
-- Use test data builders, fixture factories, or project-local test helpers for object construction; keep persistence, business behavior, and object construction in separate helpers.
+- Construct fixtures locally as described under Test Data Construction, using mapped entity instances when persistence requires them. That requirement alone does not justify a factory or copying properties from a dummy into an entity. Keep construction and persistence as explicit steps in the test; separate helper methods are not required.
 - Do not embed SQL statements in Java test code, including `JdbcTemplate` calls, native queries, multiline SQL strings, or `@Sql(statements = ...)`.
 - When SQL is genuinely necessary for database-boundary setup, put it in dedicated `.sql` files under test resources and reference those files, for example with `@Sql(scripts = ...)`.
 - Keep schema changes in migrations, not Java tests or inline test setup.
@@ -198,4 +204,5 @@ Before broadening test scope:
 
 - Identify the primary object under test and verify its field or local variable is named `sut`. Verify `@Mock` and `@Spy` collaborators are declared before `@InjectMocks`.
 - Inspect lifecycle methods, superclass setup, and test fields for hidden scenario setup. Move domain fixtures, persisted prerequisites, and scenario-specific stubs into the tests that use them.
+- Inspect new test data factories, builders, and setup helpers. Inline those that only wrap simple construction or setters; instantiate existing dummies in the tests that use them and keep scenario-specific changes visible.
 - Inspect every added or changed unchecked-exception assertion. Keep its lambda limited to the direct operation under test, with potentially throwing setup calls evaluated beforehand.
