@@ -4,16 +4,35 @@ Reusable Java agent skills for applying company engineering standards across Jav
 
 ## Skills
 
-- `java-readable-code`: readable Java code, focused responsibilities, factory naming, `Optional` usage, and avoiding hard-to-read nested method calls.
+- `java-readable-code`: readable orchestration, responsibility-based class/factory and dependency names, inspectable composition, and `Optional` usage.
 - `java-testing-style`: unit and integration testing conventions, London-style defaults, test layout, naming, and verification scope.
-- `java-solid-review`: SOLID, responsibility-boundary, code-smell, and pragmatic OO design review for Java production code. Testing guidance stays delegated to `java-testing-style`.
+- `java-solid-review`: SOLID and related engineering principles, concrete design findings, and non-trivial implementation self-review with Java examples. Testing guidance stays delegated to `java-testing-style`.
 - `java-agent-instructions`: installs or updates project-level `AGENTS.md`/`CLAUDE.md` instructions for Java skill self-review.
 - `java-logging-exceptions`: logging and exception placement guidance for domain-relevant failures and technical boundaries.
+- `java-application-security`: application security guidance for external-input validation and regex safety.
 - `java-domain-clarification`: clarification workflow before domain-sensitive implementation changes.
 - `java-clean-architecture`: Clean Architecture guidance for Java projects. This skill is guarded and should only be used when the project's main instruction file explicitly states Clean Architecture.
 - `java-ddd-architecture`: DDD guidance for Java projects, including Spring configuration placement and Spring web boundary naming. This skill is guarded and should only be used when the project's main instruction file explicitly states DDD or Domain-Driven Design.
 - `java-spring-security`: Spring Security authorization conventions for controller boundaries, capabilities, roles, and object-scoped permissions.
 - `java-flyway-migrations`: Flyway migration creation and timestamp-based version naming conventions.
+- `java-api-endpoints`: REST resource responsibilities, separate request/output contracts, authoritative persisted output, and HTTP responses, with a worked Spring MVC example.
+- `java-request-validation`: framework binding, Bean Validation, input/application ownership, Problem Details, and browser submission contracts.
+- `java-templating`: typed page models, contextual output escaping, and complete localized page/email templates using the established engine.
+- `java-authentication-security`: credential policy and migration, login protection, sessions, recovery tokens, and MFA decisions using existing authentication infrastructure.
+
+## Java Adaptation And Rule Ownership
+
+Shared engineering guidance is adapted to Java rather than copied from PHP frameworks. Preserve established Spring Data names and `Optional` absence contracts, real transaction/flush behavior, the target framework's binding and error policy, and explicit domain invariants. HTTP and presentation examples do not activate an architecture skill or require new infrastructure.
+
+Each rule has an owning skill: readable code owns naming/local operations; API endpoints own resource contracts; request validation owns binding/input errors; templating owns rendered content; authentication and Spring Security own identity lifecycle and access decisions. Cross-links route to those owners rather than duplicating policy. The agent-instruction installer reads its single canonical block from `java-agent-instructions/assets/java-skill-self-review.md`.
+
+## Verification
+
+Behavioral skill evaluations and their execution instructions are in [evals/README.md](evals/README.md). Installer regression checks run without external services:
+
+```bash
+python3 -m unittest discover -s java-agent-instructions/tests -v
+```
 
 ## Architecture Skill Activation
 

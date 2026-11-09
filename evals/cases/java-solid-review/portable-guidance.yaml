@@ -1,0 +1,68 @@
+- description: java-solid-review:self-review-material-risk
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-solid-review/SKILL.md
+    task: Treat this as the implementation just produced. Perform design self-review, report material
+      findings, and show the smallest corrected boundary. Omitted JDBC and mailer wiring is already correct.
+    code: |-
+      void issue(Invoice invoice) {
+          jdbcTemplate.update("insert into invoices (id) values (?)", invoice.id());
+          var pdf = pdfRenderer.render(invoice);
+          mailer.send(invoice.customerEmail(), pdf);
+      }
+    reference: file://../java-solid-review/references/engineering-principles.md
+  assert:
+  - type: llm-rubric
+    value: Pass only if a named material principle explains SQL/persistence mechanics mixed into issuance
+      orchestration, with a proportionate persistence collaborator. Do not dump a principle checklist
+      or require an interface without a reason.
+  metadata:
+    id: java-solid-review:self-review-material-risk
+    skill: java-solid-review
+    kind: apply
+- description: java-solid-review:self-review-may-pass
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-solid-review/SKILL.md
+    task: Review this cohesive implementation. Existing project policy owns submission rules in OrderSubmissionPolicy.
+      Persistence and events have tested contracts. Do not change correct code.
+    code: |-
+      void submit(OrderId orderId) {
+          var order = orderRepository.findById(orderId).orElseThrow();
+          orderSubmissionPolicy.submit(order);
+          orderRepository.save(order);
+          eventPublisher.publish(new OrderSubmitted(orderId));
+      }
+    reference: file://../java-solid-review/references/engineering-principles.md
+  assert:
+  - type: llm-rubric
+    value: Pass only if the review can conclude no material finding, leaves the design unchanged, and
+      does not enumerate passed principles or move policy onto the entity merely to enforce Tell Dont
+      Ask.
+  metadata:
+    id: java-solid-review:self-review-may-pass
+    skill: java-solid-review
+    kind: apply
+- description: java-solid-review:duplicated-knowledge
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-solid-review/SKILL.md
+    task: Review the discount rule and show the smallest fix. These two endpoints implement the same company
+      loyalty policy and must always agree.
+    code: |-
+      int checkoutDiscount(int points) { return points >= 1000 ? 10 : 0; }
+      int quoteDiscount(int points) { return points >= 1000 ? 10 : 0; }
+    reference: file://../java-solid-review/references/engineering-principles.md
+  assert:
+  - type: contains
+    value: DRY
+  - type: llm-rubric
+    value: Pass only if DRY explains duplicated business knowledge and a single shared loyalty rule replaces
+      the independent authorities without a generic strategy registry.
+  metadata:
+    id: java-solid-review:duplicated-knowledge
+    skill: java-solid-review
+    kind: apply

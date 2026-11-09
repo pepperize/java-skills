@@ -1,0 +1,44 @@
+- description: java-templating:complete-page-and-escaping
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-templating/SKILL.md
+    task: Refactor this rendered page boundary. Existing AccountViewService should return the complete
+      page, mapping domain data internally. The project uses Thymeleaf and a model map at the final MVC
+      render boundary. Preserve that engine and framework-required security model entries.
+    code: |-
+      var account = accountRepository.findById(accountId).orElseThrow();
+      model.addAttribute("account", account);
+      model.addAttribute("header", headerFactory.create(locale));
+      model.addAttribute("navigation", navigationFactory.create(locale));
+      return "account";
+    reference: file://../java-templating/references/presentation-examples.md
+  assert:
+  - type: llm-rubric
+    value: Pass only if a complete typed page model and semantic nested presentation data are composed
+      outside the controller, domain entities/repositories are not exposed to templates, MVC boundary
+      map/security entries remain allowed, and escaping is left to established output-context handling
+      rather than pre-escaped storage.
+  metadata:
+    id: java-templating:complete-page-and-escaping
+    skill: java-templating
+    kind: apply
+- description: java-templating:localized-email-outcomes
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-templating/SKILL.md
+    task: Design approved/declined email bodies in German and English using existing FreeMarker. Current
+      code concatenates translated paragraph fragments and temporarily disables a shared renderer page
+      layout. Preserve subjects/recipients outside bodies. Describe focused verification.
+    reference: file://../java-templating/references/presentation-examples.md
+  assert:
+  - type: llm-rubric
+    value: Pass only if each locale/outcome has a complete readable template, repeated locale/template
+      selection uses closed trusted identifiers without requiring a registry for one message, shared renderer
+      state is not mutated, output format escaping is correct, and tests render complete bodies with the
+      real engine for all applicable outcomes/locales.
+  metadata:
+    id: java-templating:localized-email-outcomes
+    skill: java-templating
+    kind: apply

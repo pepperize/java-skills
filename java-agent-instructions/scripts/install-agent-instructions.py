@@ -9,26 +9,8 @@ from pathlib import Path
 START = "<!-- java-skills:self-review:start -->"
 END = "<!-- java-skills:self-review:end -->"
 
-BLOCK = """<!-- java-skills:self-review:start -->
-## Java Skill Self Review
-
-After making Java code, test, or skill changes, review the diff before the final response.
-
-- Treat relevant Java skills as executable checklists, not background reading.
-- Before editing, name the applicable skills and the exact rules that constrain naming, exceptions, logging, validation, testing, and architecture.
-- Use `java-domain-clarification` before coding when domain rules, identifiers, persistence shape, scoping, or externally visible behavior are unclear.
-- Use `java-solid-review` for design, responsibility, SOLID, code-smell, and refactoring concerns.
-- Use `java-readable-code` for naming, guard clauses, `Optional`, factories, utilities, and readability.
-- Use `java-testing-style` for all test naming, mocks, unit/integration boundaries, assertions, layout, and verification scope.
-- Use `java-logging-exceptions`, `java-spring-security`, and `java-flyway-migrations` when changes touch those areas.
-- Use `java-clean-architecture` and `java-ddd-architecture` only when this project's instructions explicitly state those architectures.
-- Before finalizing, review new or changed helper methods with `java-readable-code`.
-- Before finalizing, review thrown/caught exceptions and logging decisions with `java-logging-exceptions`.
-- Do not add defensive branches unless the domain/API path can actually produce that state.
-- Fix issues found during self-review before finalizing.
-- Keep cleanup scoped to the requested change.
-<!-- java-skills:self-review:end -->
-"""
+TEMPLATE = Path(__file__).resolve().parent.parent / "assets" / "java-skill-self-review.md"
+BLOCK = TEMPLATE.read_text(encoding="utf-8")
 
 
 def parse_args() -> argparse.Namespace:
@@ -59,21 +41,23 @@ def resolve_target(requested_file: str | None) -> Path:
 
 
 def update_content(existing: str) -> str:
-    has_start = START in existing
-    has_end = END in existing
+    start_count = existing.count(START)
+    end_count = existing.count(END)
 
-    if has_start != has_end:
-        raise ValueError("Found only one java-skills self-review marker; refusing to update.")
+    if start_count != end_count or start_count > 1:
+        raise ValueError("Malformed or duplicate java-skills self-review markers; refusing to update.")
 
-    if has_start:
-        before, rest = existing.split(START, 1)
-        _, after = rest.split(END, 1)
-        return before.rstrip() + "\n\n" + BLOCK + after.lstrip()
+    if start_count:
+        start = existing.index(START)
+        end = existing.index(END) + len(END)
+        if end <= start:
+            raise ValueError("Reversed java-skills self-review markers; refusing to update.")
+        return existing[:start] + BLOCK.rstrip("\n") + existing[end:]
 
     if not existing.strip():
         return BLOCK
 
-    return existing.rstrip() + "\n\n" + BLOCK
+    return existing.rstrip("\n") + "\n\n" + BLOCK
 
 
 def main() -> None:

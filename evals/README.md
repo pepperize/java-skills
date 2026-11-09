@@ -1,19 +1,30 @@
 # Java Skill Evals
 
-This directory contains a first practical Promptfoo eval suite for the Java agent skills in this repository. The suite checks whether an LLM or agent applies the skill rules to small Java tasks and code review scenarios.
+This directory contains a practical Promptfoo eval suite for the Java agent skills in this repository. The suite checks whether an LLM or agent applies the skill rules to small Java tasks and code review scenarios.
 
 The cases load each skill from the repository's existing `SKILL.md` files through Promptfoo `file://` variables. Do not copy full skill text into eval cases.
 
 ## What Is Covered
 
-The initial suite focuses on rules that are concrete enough to evaluate consistently:
+The suite focuses on concrete decisions, including cases where a rule should not trigger a refactor:
 
-- `java-testing-style`: parameterized Bean Validation tests, JUnit Jupiter assertions, test naming, and `actual` result variables.
-- `java-readable-code`: avoiding `Optional` parameters and production API that exists only for tests.
+- `java-testing-style`: parameterized Bean Validation tests, JUnit Jupiter assertions, naming, and real security-boundary coverage.
+- `java-readable-code`: `Optional`, test-only API, complete local operations, responsibility-based factory naming, untracked-file review, and inspectable composition.
+- `java-solid-review`: material design self-review, duplicated knowledge, and correct designs that should remain unchanged.
+- `java-logging-exceptions`: owned construction failures, narrow catch scope, and proven persistence conflicts across real transaction boundaries.
+- `java-ddd-architecture`: domain repository ownership, remote transport mapping, Java absence contracts, and guarded activation.
 - `java-domain-clarification`: asking questions before coding ambiguous domain scoping.
 - `java-clean-architecture`: respecting the activation guard.
-- `java-spring-security`: controller boundary authorization and capability authorities.
+- `java-spring-security`: controller capability boundaries, independent read/write capabilities, session refresh, and token revocation limits.
 - `java-flyway-migrations`: timestamp migrations, applied migration integrity, and startup/Flyway validation.
+- `java-api-endpoints`: persisted public creation output, HTTP responses, and traditional HTML contract preservation.
+- `java-request-validation`: native binding, domain invariants, preserved 400 contracts, and safe original-field error locations.
+- `java-templating`: complete typed pages, contextual escaping, and localized email outcomes using the existing renderer.
+- `java-authentication-security`: legacy bcrypt migration, session lifetimes/revocation, and atomic reset-token consumption.
+- `java-agent-instructions`: canonical template ownership, untracked-file review, and review routing.
+- `java-application-security`: contextual output and explicit normalization contracts.
+
+Cases that need a linked skill reference load it through the optional `reference` variable. Both prompt templates include that content so API providers do not need filesystem access to interpret the rule. These cases are behavioral specifications; adding or parsing them is not evidence that a model passed them.
 
 ## Assertions
 
@@ -26,6 +37,8 @@ Prefer deterministic assertions first:
 Use `llm-rubric` only when exact text matching would be too brittle, such as checking that an answer asks clarification questions before implementation or explains why a guarded skill is inactive. Keep rubrics strict and short.
 
 ## Run Locally
+
+For local structural validation without model calls, use `promptfoo validate config -c evals/promptfooconfig.yaml evals/promptfooconfig.api.yaml`. Use a writable `PROMPTFOO_CONFIG_DIR` when the default Promptfoo directory is read-only. This validates configuration, not model behavior. The independent instruction-installer regression checks are documented in the root README.
 
 From the repository root:
 
@@ -126,6 +139,7 @@ Promptfoo also supports other providers. Keep provider-specific secrets in envir
 5. Load the skill with `skill: file://../<skill-name>/SKILL.md`.
 6. Add the smallest Java snippet that exercises the rule.
 7. Start with deterministic checks. Add `llm-rubric` only for semantic behavior that cannot be asserted robustly with text or regex.
+8. When a rule depends on a linked reference, load only that relevant reference with `reference: file://../<skill-name>/references/<name>.md` (or the canonical instruction asset). Include negative cases that reject over-application of the rule.
 
 Eval IDs use this convention:
 

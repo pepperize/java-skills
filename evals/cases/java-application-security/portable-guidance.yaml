@@ -1,0 +1,17 @@
+- description: java-application-security:output-context-and-normalization
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-application-security/SKILL.md
+    task: A valid display name contains < and quotes. A change proposes HTML-escaping it before storage
+      and trimming invalid values until validation passes. Explain corrections while preserving an explicit
+      existing SKU-uppercase normalization contract. Plain-text email also uses the stored value.
+  assert:
+  - type: llm-rubric
+    value: Pass only if original domain/storage data is not HTML-preescaped, output handling is contextual,
+      valid input still needs escaping, plain-text output is not HTML-escaped, invalid input is not silently
+      repaired, and the explicitly documented SKU normalization contract is preserved.
+  metadata:
+    id: java-application-security:output-context-and-normalization
+    skill: java-application-security
+    kind: apply

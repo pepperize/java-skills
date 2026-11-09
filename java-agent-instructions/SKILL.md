@@ -37,24 +37,4 @@ Pass `--file CLAUDE.md` or another path when the user requests a specific target
 
 ## Instruction Block
 
-```md
-<!-- java-skills:self-review:start -->
-## Java Skill Self Review
-
-After making Java code, test, or skill changes, review the diff before the final response.
-
-- Treat relevant Java skills as executable checklists, not background reading.
-- Before editing, name the applicable skills and the exact rules that constrain naming, exceptions, logging, validation, testing, and architecture.
-- Use `java-domain-clarification` before coding when domain rules, identifiers, persistence shape, scoping, or externally visible behavior are unclear.
-- Use `java-solid-review` for design, responsibility, SOLID, code-smell, and refactoring concerns.
-- Use `java-readable-code` for naming, guard clauses, `Optional`, factories, utilities, and readability.
-- Use `java-testing-style` for all test naming, mocks, unit/integration boundaries, assertions, layout, and verification scope.
-- Use `java-logging-exceptions`, `java-spring-security`, and `java-flyway-migrations` when changes touch those areas.
-- Use `java-clean-architecture` and `java-ddd-architecture` only when this project's instructions explicitly state those architectures.
-- Before finalizing, review new or changed helper methods with `java-readable-code`.
-- Before finalizing, review thrown/caught exceptions and logging decisions with `java-logging-exceptions`.
-- Do not add defensive branches unless the domain/API path can actually produce that state.
-- Fix issues found during self-review before finalizing.
-- Keep cleanup scoped to the requested change.
-<!-- java-skills:self-review:end -->
-```
+Before installing or reproducing the block, read [java-skill-self-review.md](assets/java-skill-self-review.md). It is the authoritative template used by the bundled installer; do not maintain another policy catalog or copy of the block in this file or the script.

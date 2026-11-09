@@ -1,0 +1,157 @@
+- description: java-readable-code:complete-local-operation
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-readable-code/SKILL.md
+    task: Refactor this report orchestration for readability. Selection belongs only to this service.
+      ReportFactory has a read-only input contract and does not mutate the supplied list. Preserve behavior
+      and avoid unrelated changes.
+    code: |-
+      Report createReport(ReportInput input) {
+          var records = recordRepository.findByPeriod(input.period());
+          var selected = new ArrayList<Record>();
+          for (var record : records) {
+              if (record.isPublished() && record.region().equals(input.region())) {
+                  selected.add(record);
+              }
+          }
+          return reportFactory.create(selected);
+      }
+    reference: file://../java-readable-code/references/orchestration-and-composition.md
+  assert:
+  - type: llm-rubric
+    value: Pass only if the result exposes load/select/create at a consistent level, extracts the complete
+      selection into a purpose-named local operation, and does not require a separate class or one predicate
+      per field. Preserve both filters. Prefer an unmodifiable result for the stated read-only boundary
+      without redundant defensive copies; mutable local construction is allowed.
+  metadata:
+    id: java-readable-code:complete-local-operation
+    skill: java-readable-code
+    kind: apply
+- description: java-readable-code:preserve-explicit-mutation-contract
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-readable-code/SKILL.md
+    task: Extract the selection into a meaningful local operation. ReportFactory explicitly sorts its
+      input list in place; changing that collaborator's API or implementation is outside this task.
+      Preserve existing behavior.
+    code: |-
+      Report createReport(List<Record> records) {
+          var selected = new ArrayList<Record>();
+          for (var record : records) {
+              if (record.isPublished()) {
+                  selected.add(record);
+              }
+          }
+          return reportFactory.create(selected);
+      }
+  assert:
+  - type: llm-rubric
+    value: Pass only if selection becomes a purpose-named local operation that still supplies a mutable
+      list to ReportFactory. The extracted loop or collection into an ArrayList is sufficient. Do not
+      pass Stream.toList(), List.copyOf(), or an unmodifiable wrapper directly to the mutating factory,
+      silently change the collaborator, or reject the task solely to enforce an immutability preference.
+  metadata:
+    id: java-readable-code:preserve-explicit-mutation-contract
+    skill: java-readable-code
+    kind: apply
+- description: java-readable-code:avoid-redundant-boundary-copies
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-readable-code/SKILL.md
+    task: Review this method. CatalogRepository returns an unmodifiable snapshot containing immutable
+      entries. CatalogRenderer reads the list synchronously without modifying it. Preserve both contracts
+      and explain the allocation implications of any proposed change.
+    code: |-
+      CatalogPage renderCatalog() {
+          var entries = new ArrayList<>(catalogRepository.findAll());
+          return catalogRenderer.render(List.copyOf(entries));
+      }
+  assert:
+  - type: llm-rubric
+    value: Pass only if the redundant mutable copy and subsequent snapshot copy are removed, the existing
+      repository snapshot is passed to the read-only renderer, and the answer explains avoiding copying
+      references and additional allocations without claiming a measured speedup. Do not prescribe a new
+      collection library, deep copying, mutation of supplied data, or copies at every layer.
+  metadata:
+    id: java-readable-code:avoid-redundant-boundary-copies
+    skill: java-readable-code
+    kind: apply
+- description: java-readable-code:factory-role-and-untracked-file
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-readable-code/SKILL.md
+    task: Perform pre-final review. git status shows ?? DtoConstraintGenerator.java and ?? RequestValidator.java,
+      but staged/unstaged diffs are empty. The generator only interprets DTO metadata and constructs DtoConstraints;
+      it has no scalar-generation responsibility. Show corrected class/operation names and the consumer
+      dependency/call. Preserve construction behavior.
+    code: |-
+      class DtoConstraintGenerator {
+          DtoConstraints generate(Class<?> dtoType) { /* correct metadata construction */ }
+      }
+      class RequestValidator {
+          private final DtoConstraintGenerator constraints;
+          // constructor omitted
+          void validate(Class<?> dtoType) {
+              var rules = constraints.generate(dtoType);
+              // existing validation
+          }
+      }
+  assert:
+  - type: contains
+    value: Factory
+  - type: contains
+    value: create
+  - type: llm-rubric
+    value: Pass only if untracked files are reviewed despite empty diffs; object construction is identified
+      as the responsibility; the collaborator is named for DtoConstraints plus Factory with create();
+      and consumer type, dependency name and call are updated consistently. Do not introduce extra infrastructure.
+  metadata:
+    id: java-readable-code:factory-role-and-untracked-file
+    skill: java-readable-code
+    kind: apply
+- description: java-readable-code:scalar-generator-and-retrieval-keep-roles
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-readable-code/SKILL.md
+    task: Review naming only. Report actual violations; leave justified names intact.
+    code: |-
+      class PublicUrlGenerator {
+          String generate(long id) { return "/users/" + id; }
+      }
+      interface UserRepository {
+          Optional<User> findById(long id);
+      }
+  assert:
+  - type: llm-rubric
+    value: Pass only if the scalar PublicUrlGenerator and UserRepository remain in their roles rather
+      than becoming factories solely because their methods return values/objects. Preserve findById and
+      Optional absence.
+  metadata:
+    id: java-readable-code:scalar-generator-and-retrieval-keep-roles
+    skill: java-readable-code
+    kind: apply
+- description: java-readable-code:inspectable-composition
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-readable-code/SKILL.md
+    task: Make the meaningful intermediate results inspectable while preserving this page composition.
+      No new collaborators are needed.
+    code: |-
+      return new AccountPageViewModel(
+          headerViewModelFactory.create(locale),
+          accountViewService.fetchContent(accountId),
+          navigationViewModelFactory.create(locale));
+  assert:
+  - type: llm-rubric
+    value: Pass only if header, content and navigation collaborator results become meaningful locals before
+      construction. Do not create new factories for literals or already-available values.
+  metadata:
+    id: java-readable-code:inspectable-composition
+    skill: java-readable-code
+    kind: apply

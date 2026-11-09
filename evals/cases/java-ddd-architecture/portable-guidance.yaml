@@ -1,0 +1,39 @@
+- description: java-ddd-architecture:remote-repository-optional-boundary
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-ddd-architecture/SKILL.md
+    task: Refactor a domain AccountRepository currently returning VendorAccountResponse from findAccountFromHttp.
+      It retrieves accounts from a remote API. Missing accounts are ordinary absence, and existing Java
+      callers use Optional<Account>. Show the contract and responsibility placement, not a complete HTTP
+      client.
+    project_instructions: AGENTS.md explicitly selects DDD. Domain owns Account and AccountId; infrastructure
+      owns the vendor client.
+    reference: file://../java-ddd-architecture/references/repository-boundaries.md
+  assert:
+  - type: llm-rubric
+    value: Pass only if the domain contract returns Optional<Account> through findById or established
+      Java naming, infrastructure maps vendor responses, domain models/contracts remain independent of
+      transport, and technical errors are not swallowed as absence. Do not require PHP-style NotFoundException
+      or generic unused CRUD.
+  metadata:
+    id: java-ddd-architecture:remote-repository-optional-boundary
+    skill: java-ddd-architecture
+    kind: apply
+- description: java-ddd-architecture:activation-guard
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-ddd-architecture/SKILL.md
+    task: Reorganize this small Java application using your architecture skill. It has Controller, Service,
+      Repository packages and no declared architectural style.
+    project_instructions: AGENTS.md says Java 21 and Spring Boot. It does not state DDD or Domain-Driven
+      Design.
+  assert:
+  - type: llm-rubric
+    value: Pass only if the DDD skill stays inactive because the instructions do not explicitly select
+      DDD, without imposing a domain/infrastructure relocation.
+  metadata:
+    id: java-ddd-architecture:activation-guard
+    skill: java-ddd-architecture
+    kind: apply

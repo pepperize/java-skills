@@ -1,0 +1,45 @@
+- description: java-spring-security:independent-write-capability
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-spring-security/SKILL.md
+    task: A controller uses a class-level ACCOUNT_READ default and a method-level ACCOUNT_WRITE override.
+      Make each handler's complete capability requirement visible at the method while preserving effective
+      Spring behavior. Read/write are independent. Do not duplicate coarse checks in the service; state
+      necessary integration verification.
+    code: |-
+      @PreAuthorize("hasAuthority('ACCOUNT_READ')")
+      class AccountController {
+          @GetMapping("/accounts")
+          List<AccountDto> getAccounts() { return accountService.read(); }
+          @PostMapping("/accounts")
+          @PreAuthorize("hasAuthority('ACCOUNT_WRITE')")
+          AccountDto postAccounts(CreateAccountRequest request) { return accountService.create(request); }
+      }
+  assert:
+  - type: llm-rubric
+    value: Pass only if each protected method has its complete appropriate capability, write does not
+      accidentally require read, role checks are avoided, and verification exercises enabled method security
+      and the real filter chain rather than only scanning annotations. Do not claim Spring implicitly
+      ANDs the class-level read declaration with the overriding method-level write declaration.
+  metadata:
+    id: java-spring-security:independent-write-capability
+    skill: java-spring-security
+    kind: apply
+- description: java-spring-security:session-and-token-freshness
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-spring-security/SKILL.md
+    task: An admin role is revoked while the account has a server session caching authorities and a self-contained
+      JWT valid for an hour. Specify how each meets an explicit next-request revocation requirement. Do
+      not replace the authentication stack.
+  assert:
+  - type: llm-rubric
+    value: Pass only if cached session authorities are refreshed/revoked using real account state/security
+      version or equivalent, and the JWT is not claimed immediately revoked without an online revocation/introspection/version
+      mechanism. Expiry alone leaves a stale window and cannot satisfy the stated next-request requirement.
+  metadata:
+    id: java-spring-security:session-and-token-freshness
+    skill: java-spring-security
+    kind: apply
