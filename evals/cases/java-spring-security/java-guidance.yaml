@@ -1,0 +1,111 @@
+- description: java-spring-security:independent-operation-authority
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-spring-security/SKILL.md
+    task: A controller uses a class-level ACCOUNT_READ default and a method-level ACCOUNT_CREATE override.
+      Remove class-level authorization and make each public handler's single resource-operation authority
+      visible at the method while preserving effective Spring behavior. Read/create are independent. Do not duplicate coarse checks in the service; state
+      necessary integration verification.
+    code: |-
+      @PreAuthorize("hasAuthority('ACCOUNT_READ')")
+      class AccountController {
+          @GetMapping("/accounts")
+          public List<AccountDto> getAccounts() { return accountService.read(); }
+          @PostMapping("/accounts")
+          @PreAuthorize("hasAuthority('ACCOUNT_CREATE')")
+          public AccountDto postAccounts(CreateAccountRequest request) { return accountService.create(request); }
+      }
+  assert:
+  - type: llm-rubric
+    value: Pass only if class-level authorization is removed and public handlers declare exactly one authority,
+      ACCOUNT_READ for retrieval and ACCOUNT_CREATE for creation. Creation must not also require read; role checks are avoided, and verification exercises enabled method security
+      and the real filter chain rather than only scanning annotations. Do not claim Spring implicitly
+      ANDs the class-level read declaration with the overriding method-level create declaration.
+  metadata:
+    id: java-spring-security:independent-operation-authority
+    skill: java-spring-security
+    kind: apply
+- description: java-spring-security:session-and-token-freshness
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-spring-security/SKILL.md
+    task: An admin role is revoked while the account has a server session caching authorities and a self-contained
+      JWT valid for an hour. Specify the freshness guarantee required by this skill and how to meet it
+      for both credentials. Do not replace the authentication stack or assume a new JWT invalidates the old one.
+  assert:
+  - type: llm-rubric
+    value: Pass only if cached session authorities are refreshed/revoked using real account state/security
+      version or equivalent, and the JWT is not claimed immediately revoked without an online revocation/introspection/version
+      mechanism. Expiry alone leaves a stale window and cannot satisfy the stated next-request requirement.
+  metadata:
+    id: java-spring-security:session-and-token-freshness
+    skill: java-spring-security
+    kind: apply
+- description: java-spring-security:single-operation-authority
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-spring-security/SKILL.md
+    task: Correct UserController.createUser, currently protected by USER_WRITE and USER_APPROVE joined
+      with AND. There is also a separate approveUser handler. Explain the role mapping and provide good
+      and bad Java examples. Do not rename the handlers, add a new annotation processor or duplicate
+      checks in UserService. Both operations already have their own business policies.
+  assert:
+  - type: contains
+    value: "hasAuthority('USER_CREATE')"
+  - type: contains
+    value: "hasAuthority('USER_APPROVE')"
+  - type: llm-rubric
+    value: Pass only if corrected public createUser and approveUser handlers each declare exactly one
+      direct method-level authority, USER_CREATE and USER_APPROVE respectively. Reject combined generic
+      permissions and role checks; centralize role-to-authority grants and keep business policies in the
+      owning operations. Include good and bad examples, without imposing renamed handlers or a custom engine.
+  metadata:
+    id: java-spring-security:single-operation-authority
+    skill: java-spring-security
+    kind: apply
+- description: java-spring-security:route-classification
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-spring-security/SKILL.md
+    task: Review access for an authenticated-only profile controller with no annotation, a protected
+      createUser controller, public password-reset confirmation using a bearer reset token, and Spring
+      Security-managed logout. A developer says every unannotated route is public and proposes a logout
+      controller just to add PreAuthorize. State the required declarations, filter-chain coverage and
+      integration checks. Include good and bad examples. Browser authentication uses session cookies.
+  assert:
+  - type: llm-rubric
+    value: Pass only if profile declares isAuthenticated, createUser declares only USER_CREATE, public
+      reset access is explicitly permitted without login while validating its token, and logout stays
+      framework-managed. Missing annotations do not imply public access. Require method security plus
+      matching filter-chain/catch-all coverage, CSRF for cookie-authenticated state changes, intentional
+      public-route inventory and real denial-before-work verification. Do not require a custom annotation
+      resolver or treat public access as automatically bypassing CSRF.
+  metadata:
+    id: java-spring-security:route-classification
+    skill: java-spring-security
+    kind: apply
+- description: java-spring-security:object-scope-outside-authority-expression
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-spring-security/SKILL.md
+    task: UserController.updateUser currently combines USER_UPDATE with hasPermission(userId) and the
+      application service accepts Authentication. ADMIN bypasses tenant checks. Refactor this to the
+      collection's security boundaries with good and bad examples. CurrentUser and a domain-aware tenant
+      policy already exist. Do not invent new domain rules or new authorization frameworks.
+    reference: file://../java-spring-security/references/authorization-examples.md
+  assert:
+  - type: llm-rubric
+    value: Pass only if updateUser declares just USER_UPDATE and entry-boundary adaptation supplies an
+      application-owned actor value. The application/domain policy enforces tenant/ownership rules using
+      trusted identity and loaded domain state within the operation. Remove the ADMIN bypass and keep
+      Authentication/context APIs out of application/domain contracts. Do not add IDs to authorities,
+      preserve combined hasPermission checks, or duplicate USER_UPDATE in the service. Include good and bad examples.
+  metadata:
+    id: java-spring-security:object-scope-outside-authority-expression
+    skill: java-spring-security
+    kind: apply

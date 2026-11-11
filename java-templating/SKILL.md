@@ -29,7 +29,7 @@ Do not HTML-escape plain-text emails. Keep rendering format explicit and verify 
 
 ## Translation And Authored Content
 
-Keep short interface messages and parameterized subjects in the existing translation catalog. Use named parameters and locale-aware pluralization supported by that system rather than concatenating translated fragments. Preserve the project's symbolic versus source-text key convention; do not impose PHP helper names or a new key system.
+Keep short interface messages and parameterized subjects in the existing translation catalog. Use named parameters and locale-aware pluralization supported by that system rather than concatenating translated fragments. Preserve the project's translation API and symbolic versus source-text key convention.
 
 Keep complete source-controlled long-form page translations with their meaningful markup in locale-specific templates/fragments. For database/CMS content, use its existing content model and sanitization policy instead of duplicating content in templates. Prefer purpose-first filenames with locale suffixes, subject to the engine's existing conventions. Keep structural anchors consistent across translations and make fallback behavior explicit.
 

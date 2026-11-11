@@ -19,6 +19,17 @@ Follow the DDD rules in the project's own instruction files and domain docs.
 - Ask for clarification before changing aggregates, entities, value objects, repositories, domain services, bounded-context language, or domain invariants when rules are missing or unclear.
 - Prefer anemic domain models with behavior primarily in services unless there is a strong reason to keep logic on the entity itself.
 
+## Application And Domain Services
+
+When adding or refactoring services, read [service boundaries and good/bad examples](references/service-boundaries.md).
+
+- Application services execute use cases. Accept application input DTOs, coordinate repositories, domain services and factories, and return application output DTOs. Keep HTTP mechanisms and client transport types outside their contracts. For resource operations, follow [java-api-endpoints](../java-api-endpoints/SKILL.md#responsibilities-and-naming).
+- Domain services implement business behavior using domain models and value objects. Follow this collection's anemic-model convention: put business operations in purpose-named domain services, not in controller or application orchestration code. Domain services do not accept application request DTOs or construct public output DTOs.
+- The application service loads the required domain models, invokes domain behavior, persists changes and constructs output. Domain services are collaborators for business behavior, not a mandatory extra step in every repository call.
+- Keep transaction orchestration in the application service and technical communication in infrastructure. Domain services do not depend on servlet, Spring Security, HTTP response, ORM-operation or vendor-client APIs.
+- Keep resource application-service names such as `UserService` and purpose-based domain-service names such as `ProductPricingService`. Their packages establish application/domain ownership; Spring's `@Service` annotation does not establish that distinction.
+- Throw meaningful exceptions where the failed condition is detected and owned. Do not return exception objects or catch domain exceptions merely to replace them with HTTP responses. Follow `java-logging-exceptions` for translation and failure-policy ownership.
+
 ## Repository Contracts
 
 When adding or refactoring a domain repository, read [repository boundaries](references/repository-boundaries.md).
@@ -37,7 +48,7 @@ Before finalizing, check dependency direction and ownership of returned types, n
 
 Keep servlet requests, Spring Security authentication/context APIs, session objects, and authorization engine mechanisms outside the domain. When application operations need actor identity, adapt it to an application-owned value such as `CurrentUser` at the entry boundary rather than passing the request or security context through the call chain.
 
-Use `java-spring-security` for coarse capabilities and object-scoped decisions. Keep ownership, tenant scope, lifecycle, and privilege-change invariants with the operation that has the relevant domain data and transaction. Do not encode resource IDs into capability names or duplicate coarse controller checks inside services.
+Use [java-spring-security](../java-spring-security/SKILL.md#authorization-boundary) for controller authorities: one resource-operation authority declared directly on each protected public handler. Keep ownership, tenant scope, lifecycle, and privilege-change invariants with the application/domain operation that has the relevant domain data and transaction, outside the coarse authority expression. Do not encode resource IDs into capability names or duplicate coarse controller checks inside services. Read its [good/bad examples](../java-spring-security/references/authorization-examples.md#object-scope-and-actor-identity) when implementing actor-dependent rules.
 
 ## Spring Configuration
 

@@ -19,6 +19,8 @@ Keep orchestration at one level of abstraction. Extract a complete meaningful op
 
 Prefer a private method when an operation belongs to one owner. Introduce a collaborator when an independent responsibility, actual reuse, complexity, or composition benefit justifies it. Returning an object does not by itself require a factory class. Leave ordinary expressions inline when extraction would only add indirection.
 
+Do not extract helpers to hide exception translation or recovery policy from the operation that owns it. Apply the exception policy ownership rules and good/bad examples in `java-logging-exceptions` before extracting a `try/catch` from orchestration.
+
 For before/after Java examples, read [orchestration and composition](references/orchestration-and-composition.md) when refactoring complex orchestration or result construction. Local extraction must preserve input contracts and exception ownership under `java-request-validation` and `java-logging-exceptions`.
 
 ## Dependency Names
@@ -58,7 +60,15 @@ Identify the primary responsibility before choosing a class name. When that resp
 
 This naming rule does not require a new class for every construction operation. Retrieval, validation, rendering, and scalar generation retain their own roles even when they return objects. Preserve framework contracts, explicit project terminology, and established Java factories such as `of(...)` and `from(...)`.
 
-For REST resource work, use `java-api-endpoints` for request/output contracts and HTTP responses. Follow existing Spring Data repository operation names; do not rename `findById` to `find` or invent unused CRUD methods to copy another language's conventions.
+For REST resource work, follow [java-api-endpoints](../java-api-endpoints/SKILL.md#responsibilities-and-naming) for Controller -> Application Service -> Repository -> optional Client, request/output contracts and HTTP responses. Read its [worked flow and good/bad examples](../java-api-endpoints/references/user-endpoint.md#flow-and-contracts) when implementing or refactoring these collaborators. Follow existing Spring Data repository operation names, including `findById`, and declare only operations production callers need.
+
+## Hydrators
+
+When a collaborator fills an existing target object with values from one or more source objects, name it `<TargetType>Hydrator`. Use `hydrate(target, sources...)`, with the target first. Mutate and return the same target instance. Object creation belongs to the caller or a factory.
+
+```java
+erpProduct = erpProductHydrator.hydrate(erpProduct, product, billOfMaterials);
+```
 
 ## Method Names
 
@@ -153,5 +163,6 @@ Before finalizing Java code changes:
 - Accessors may use noun names. Predicates should use `is`, `has`, `can`, `should`, or similar.
 - Action, operation, formatting, mapping, and helper methods must use verb phrases.
 - Remove helper methods that only hide one obvious call unless they enforce a real invariant or improve a repeated concept.
+- For every added or changed `catch` and extracted helper containing a `catch`, apply the required exception self-review in `java-logging-exceptions`; exception policy ownership takes precedence over making orchestration shorter.
 - Check any new defensive branch against known domain/API assumptions. If the user or project states the value cannot occur, do not add handling for it without asking.
 - For non-trivial implementations and refactors, apply the implementation self-review in `java-solid-review` and fix material issues within scope.

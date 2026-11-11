@@ -9,6 +9,50 @@ description: Implement or review Java HTTP binding, request DTO validation, vali
 
 Inspect the installed Java/Spring version, serializers, binding/coercion settings, validation provider, controller signatures, error handlers, and submission contract. Reuse them. Preserve published unknown-field, media-type, error-collection, normalization, and compatibility behavior unless changing it is requested. Do not introduce a reflection hydrator, DTO registry, servlet filter, or custom argument resolver when framework binding already satisfies the requirement.
 
+## Spring MVC Request Processing
+
+For servlet-based Spring MVC, distinguish framework processing from application collaboration:
+
+```text
+HTTP request
+  -> Spring Security filter chain: authentication and request authorization
+  -> Spring MVC: routing, argument resolution, conversion and validation
+  -> Controller invocation, including configured method-security interception
+  -> Application service -> Repository -> optional Client
+  -> Spring MVC: response handling and serialization
+```
+
+Spring MVC constructs controller arguments after the servlet filters, not inside a DTO-building filter. `@RequestBody` uses an `HttpMessageConverter`; `@ModelAttribute` uses data binding. Configured Bean Validation runs during MVC processing before the handler body, with explicit `BindingResult` handling for form flows where required. Request authorization and method authorization are distinct; `@PreAuthorize` uses method interception. Use [java-spring-security](../java-spring-security/SKILL.md) for their policy and composition.
+
+Good: let MVC resolve and validate the DTO, then call application code.
+
+```java
+@PostMapping("/api/users")
+@PreAuthorize("hasAuthority('USER_CREATE')")
+public ResponseEntity<UserDto> postUsers(@Valid @RequestBody CreateUserRequest request) {
+    var userDto = userService.create(request);
+    var location = userUrlGenerator.create(userDto.id());
+
+    return ResponseEntity.created(location).body(userDto);
+}
+```
+
+Bad: manually repeat security, deserialization and validation in the handler.
+
+```java
+@PostMapping("/api/users")
+public UserDto postUsers(HttpServletRequest request) throws IOException {
+    checkBearerToken(request);
+    checkAuthority(request, "USER_CREATE");
+    var input = objectMapper.readValue(request.getInputStream(), CreateUserRequest.class);
+    validate(input);
+
+    return userService.create(input);
+}
+```
+
+These excerpts assume existing collaborators and a protected endpoint with method security enabled. Reuse the configured security and MVC infrastructure; do not add custom filters, argument resolvers or URL-generator wrappers solely to reproduce an example.
+
 ## Validation Ownership
 
 - Validate external request shape at the entry boundary: required values, nullability, types, lengths, formats, supported values, and input-only cross-field rules. For MVC JSON bodies, prefer typed `@RequestBody` plus Bean Validation with `@Valid` or the project's validation groups.
@@ -45,3 +89,5 @@ Follow `java-testing-style`. Exercise real binding, metadata, error advice and s
 For changed browser flows, verify local feedback, preserved safe input, stable-code mapping, unknown-error handling, and success navigation only after confirmed success. For cross-engine format sharing, run common acceptance/rejection cases in both actual engines rather than comparing pattern text alone. Keep credentials out of redisplay, responses, and logs.
 
 Reference: [Spring MVC validation](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-validation.html). Use version-matched documentation; this skill does not require upgrading Spring.
+
+For processing mechanisms, see [request-body conversion](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-methods/requestbody.html), [model-attribute binding](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-methods/modelattrib-method-args.html), and [Spring Security method interception](https://docs.spring.io/spring-security/reference/servlet/authorization/method-security.html).

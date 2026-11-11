@@ -15,6 +15,13 @@ description: Use when adding or changing Java tests, fixing failing tests, doing
 - Keep assertions simple and readable.
 - Do not add tests for unchanged existing behavior solely because an acceptance criterion mentions it. Test the regression risk introduced by the change at the boundary where the new composition occurs, and rely on existing collaborator contracts unless those contracts or their integration changed.
 
+## Test Subjects, Class Names, And Boundaries
+
+- Name test classes exactly `<ProductionClassName>Test` for unit tests and `<ProductionClassName>IT` for integration tests. The prefix must identify the production class under test; do not substitute a feature, workflow, or scenario name or append one before the suffix. Put scenarios in test method names or nested classes.
+- In request/response applications, place integration tests at controller and repository boundaries. Test intermediate layers, including application services, use cases, and orchestration classes, with unit tests and mocked collaborators.
+- Exercise request-level transaction behavior, including rollback across multiple repositories, through controller integration tests. Exercise queries, ORM mappings, cascades, constraints, and optimistic locking through repository integration tests.
+- A service coordinating database changes does not justify a service integration test. Choose the test boundary from the production responsibility before choosing Spring or Testcontainers; using infrastructure does not justify the boundary.
+
 ## Unit Tests
 
 - Default to London-style unit tests for application services, use cases, orchestration classes, ports, and clients.
@@ -157,11 +164,11 @@ var actual = assertThrows(RuntimeException.class, () -> sut.load(locales));
 
 ## Integration Tests
 
-- Place integration tests at technical boundaries where framework or infrastructure behavior is the risk: Spring controllers, authentication, authorization, binding, serialization, repositories, and external clients with stable realistic infrastructure such as Testcontainers or Localstack.
+- Place integration tests at technical boundaries where framework or infrastructure behavior is the risk. For request/response applications, use controller ITs for HTTP, authentication, authorization, binding, serialization, and request-level transaction behavior, and repository ITs for persistence. External client adapters may have ITs with stable realistic infrastructure such as Testcontainers or Localstack; this does not extend integration testing to intermediate service layers.
 - Use unit tests instead for external systems that cannot be exercised stably and realistically.
 - Keep lightweight unit tests in `src/test/java`.
-- Put integration tests in `src/test-integration/java` or `src/test-it/java`, name classes with an `IT` suffix, and avoid `MvcTest` or `IntegrationTest` suffixes.
-- Tests using `@SpringBootTest`, `@DataJpaTest`, `MockMvc`, Testcontainers, real repositories, or other framework/infrastructure boundaries belong in `src/test-integration/java` or `src/test-it/java`.
+- Put integration tests in `src/test-integration/java` or `src/test-it/java`, name classes exactly `<ProductionClassName>IT`, and avoid `MvcTest` or `IntegrationTest` suffixes.
+- Tests using `@SpringBootTest`, `@DataJpaTest`, `MockMvc`, Testcontainers, real repositories, or other framework/infrastructure boundaries belong in `src/test-integration/java` or `src/test-it/java`. This placement rule does not authorize integration tests for intermediate layers.
 
 ## Security Integration Coverage
 
@@ -189,8 +196,10 @@ For database, configuration, migration, dependency, template, or resource change
 
 - Mapper, factory, and small service changes: focused unit tests first.
 - Use case and adapter orchestration changes: affected unit test classes.
-- Controller, security, and event-listener changes: relevant integration tests.
-- Persistence, object storage, file parsing, and infrastructure boundaries: boundary integration tests plus focused unit tests around helper collaborators when present.
+- Controller and security changes: affected controller integration tests through the real HTTP/security boundary.
+- Persistence changes: affected repository integration tests. Verify cross-repository request transaction behavior through the affected controller IT.
+- External client and storage adapter changes: affected technical-boundary integration tests where infrastructure is stable and realistic.
+- Event-listener orchestration, file-parsing logic, and helper collaborators: focused unit tests; add boundary integration coverage only for changed framework wiring or infrastructure behavior at the owning technical boundary.
 
 ## Verification Scope Review
 
@@ -202,6 +211,7 @@ Before broadening test scope:
 
 ## Required Pre-Final Test Review
 
+- Check every added or changed test class: its name must be exactly the production class name plus `Test` or `IT`. In request/response applications, controller and repository boundaries receive ITs; intermediate services, use cases, and orchestration receive unit tests. Move misplaced coverage to the owning boundary rather than merely renaming the test.
 - Identify the primary object under test and verify its field or local variable is named `sut`. Verify `@Mock` and `@Spy` collaborators are declared before `@InjectMocks`.
 - Inspect lifecycle methods, superclass setup, and test fields for hidden scenario setup. Move domain fixtures, persisted prerequisites, and scenario-specific stubs into the tests that use them.
 - Inspect new test data factories, builders, and setup helpers. Inline those that only wrap simple construction or setters; instantiate existing dummies in the tests that use them and keep scenario-specific changes visible.
