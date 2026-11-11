@@ -20,9 +20,9 @@ Reusable Java agent skills for applying company engineering standards across Jav
 - `java-templating`: typed page models, contextual output escaping, and complete localized page/email templates using the established engine.
 - `java-authentication-security`: credential policy and migration, login protection, sessions, recovery tokens, and MFA decisions using existing authentication infrastructure.
 
-## Java Adaptation And Rule Ownership
+## Java Conventions And Rule Ownership
 
-Shared engineering guidance is adapted to Java rather than copied from PHP frameworks. Preserve established Spring Data names and `Optional` absence contracts, real transaction/flush behavior, the target framework's binding and error policy, and explicit domain invariants. HTTP and presentation examples do not activate an architecture skill or require new infrastructure.
+The guidance follows established Java and Spring conventions. Preserve established Spring Data names and `Optional` absence contracts, real transaction/flush behavior, the target framework's binding and error policy, and explicit domain invariants. HTTP and presentation examples do not activate an architecture skill or require new infrastructure.
 
 Each rule has an owning skill: readable code owns naming/local operations; API endpoints own resource contracts; request validation owns binding/input errors; templating owns rendered content; authentication and Spring Security own identity lifecycle and access decisions. Cross-links route to those owners rather than duplicating policy. The agent-instruction installer reads its single canonical block from `java-agent-instructions/assets/java-skill-self-review.md`.
 

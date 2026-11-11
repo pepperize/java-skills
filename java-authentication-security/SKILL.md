@@ -11,7 +11,7 @@ Inspect the installed Spring Security version, authentication mechanism, identit
 
 Keep framework identity and servlet/session mechanisms at security/web boundaries. Adapt actor identity to an application-owned value where application operations need it. Use `java-spring-security` for capabilities and object scope; use `java-logging-exceptions` for security-event handling and secret exclusion.
 
-Read [password policy and migration](references/password-policy.md) when password acceptance, encoding, or legacy credentials change. That reference owns policy choices and Java length/encoder pitfalls; do not mechanically copy a PHP policy or retrofit new-password rules onto login.
+Read [password policy and migration](references/password-policy.md) when password acceptance, encoding, or legacy credentials change. That reference owns policy choices and Java length/encoder pitfalls; keep new-password acceptance rules separate from login verification of existing credentials.
 
 ## Login And Attack Protection
 
@@ -36,6 +36,8 @@ For server-side browser sessions, preserve framework session-fixation protection
 Configure `Secure`, `HttpOnly`, appropriate `SameSite`, and narrow cookie scope. Enforce documented idle and absolute lifetimes server-side; updating last activity must not extend the immutable authentication time. Spring/servlet idle timeout alone does not establish an absolute timeout.
 
 Make account disablement, password reset/change, and privilege changes revoke or refresh affected access under an explicit freshness policy. A security version or active-session store can support server-side revocation; do not assume cached authorities refresh automatically. Stateless tokens require an explicit expiry/revocation strategy and documented stale-access window. Refresh tokens and provider-managed sessions follow their actual provider contracts rather than invented local session rules.
+
+For role/authority grants and revocations, [java-spring-security](../java-spring-security/SKILL.md#privilege-freshness) requires changes to take effect on the next request, including existing sessions and tokens. Token expiry alone cannot meet that requirement.
 
 Keep CSRF protection for browser credentials that are automatically attached, including cookie-authenticated JSON requests. Preserve authenticated/recovery response cache policy and avoid leaking secrets through URLs beyond deliberately designed bearer links.
 

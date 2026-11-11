@@ -15,7 +15,7 @@ The suite focuses on concrete decisions, including cases where a rule should not
 - `java-ddd-architecture`: domain repository ownership, remote transport mapping, Java absence contracts, and guarded activation.
 - `java-domain-clarification`: asking questions before coding ambiguous domain scoping.
 - `java-clean-architecture`: respecting the activation guard.
-- `java-spring-security`: controller capability boundaries, independent read/write capabilities, session refresh, and token revocation limits.
+- `java-spring-security`: single resource-operation authorities on controller methods, route classification, object scope, and next-request session/token privilege freshness.
 - `java-flyway-migrations`: timestamp migrations, applied migration integrity, and startup/Flyway validation.
 - `java-api-endpoints`: persisted public creation output, HTTP responses, and traditional HTML contract preservation.
 - `java-request-validation`: native binding, domain invariants, preserved 400 contracts, and safe original-field error locations.

@@ -23,6 +23,27 @@
     id: java-api-endpoints:persisted-resource-response
     skill: java-api-endpoints
     kind: apply
+- description: java-api-endpoints:remote-resource-layer-contracts
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-api-endpoints/SKILL.md
+    task: A UserController calls UserClient and converts VendorUserResponse to UserDto. Refactor this
+      read endpoint into this collection's resource flow. There is no declared DDD architecture.
+      CreateUserRequest elsewhere is an application-owned validated DTO with no HTTP dependencies;
+      explain whether a field-identical CreateUserCommand is required. Show good and bad Java examples.
+    reference: file://../java-api-endpoints/references/user-endpoint.md
+  assert:
+  - type: llm-rubric
+    value: Pass only if the controller delegates to UserService, the application service returns UserDto
+      built from a User obtained through UserRepository, and a repository implementation hides UserClient
+      and maps VendorUserResponse to User in infrastructure. Do not activate DDD or require a field-identical
+      command. Preserve Spring Data-style findById and ordinary Optional absence where used. Include good
+      and bad examples and keep technical failures distinct from absence.
+  metadata:
+    id: java-api-endpoints:remote-resource-layer-contracts
+    skill: java-api-endpoints
+    kind: apply
 - description: java-api-endpoints:traditional-html-contract
   prompts:
   - apply-skill

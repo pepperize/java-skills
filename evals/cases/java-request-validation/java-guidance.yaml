@@ -19,6 +19,27 @@
     id: java-request-validation:native-binding-and-domain-invariants
     skill: java-request-validation
     kind: apply
+- description: java-request-validation:security-filters-versus-mvc-binding
+  prompts:
+  - apply-skill
+  vars:
+    skill: file://../java-request-validation/SKILL.md
+    project_instructions: Servlet-based Spring MVC, Spring Security, Jakarta Validation and enabled
+      method security. USER_CREATE is checked on the controller with PreAuthorize.
+    task: A developer proposes a servlet filter to authenticate requests, deserialize CreateUserRequest,
+      validate it, and attach it to the request. The controller currently parses JSON manually and calls
+      checkAuthority. Explain the correct processing boundaries and show good and bad Java examples.
+  assert:
+  - type: llm-rubric
+    value: Pass only if authentication/request authorization remain in Spring Security, PreAuthorize
+      is identified as method interception, and DTO conversion/validation use Spring MVC argument resolution
+      after filters with RequestBody, HttpMessageConverter and Valid. Mention ModelAttribute data binding
+      for form input. The controller delegates validated input to the application service without manual
+      security/parsing/validation or a custom DTO-building filter. Include good and bad Java examples.
+  metadata:
+    id: java-request-validation:security-filters-versus-mvc-binding
+    skill: java-request-validation
+    kind: apply
 - description: java-request-validation:problem-locations-and-safe-diagnostics
   prompts:
   - apply-skill

@@ -5,7 +5,7 @@
     skill: file://../java-spring-security/SKILL.md
     task: |
       Review and correct the authorization placement. This admin endpoint should require
-      INSTALLATION_CONTENT_PAGE_MANAGE.
+      INSTALLATION_CONTENT_PAGE_CREATE.
     code: |
       import org.springframework.security.access.prepost.PreAuthorize;
       import org.springframework.stereotype.Service;
@@ -34,11 +34,11 @@
     - type: contains
       value: '@PreAuthorize'
     - type: contains
-      value: "hasAuthority('INSTALLATION_CONTENT_PAGE_MANAGE')"
+      value: "hasAuthority('INSTALLATION_CONTENT_PAGE_CREATE')"
     - type: not-regex
       value: '(^|\n)\s*@PreAuthorize\("has(Any)?Role'
     - type: llm-rubric
-      value: 'Pass only if authorization is moved or placed at the controller/API boundary, uses a direct capability authority with hasAuthority, avoids hasRole/hasAnyRole, and does not duplicate the same authorization in the service layer unless it identifies a separate security boundary.'
+      value: 'Pass only if authorization is moved or placed at the controller/API boundary, declares exactly one resource-operation authority with hasAuthority directly on the public handler, avoids class-level checks and hasRole/hasAnyRole, and does not duplicate the same authorization in the service layer unless it identifies a separate security boundary.'
   metadata:
     id: java-spring-security:controller-preauthorize-authority
     skill: java-spring-security
